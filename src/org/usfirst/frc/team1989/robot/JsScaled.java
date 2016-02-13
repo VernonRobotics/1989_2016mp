@@ -5,12 +5,11 @@ import edu.wpi.first.wpilibj.Joystick;
 public class JsScaled extends Joystick {
     public double low = .9; // set to 1 /full drive if above
     public double deadzone = .15; //set to 0 if below
-// programatic x y twist and buttons for auto
     public double pY = 0; 
     public double pX = 0;
     public double pTwist = 0;
     public boolean[] buttons;
-
+    
     public JsScaled(int port, double low, double deadzone) {
 	this(port);
 	this.low = low;
@@ -20,11 +19,6 @@ public class JsScaled extends Joystick {
 
     public JsScaled(int port) {
 	super(port);
-	buttons = new boolean[12];
-	for (int i = 0; i<12; i++)
-	{
-	    buttons[i] = false;
-	}
 	// TODO Auto-generated constructor stub
     }
 
@@ -49,7 +43,7 @@ public class JsScaled extends Joystick {
     }
 
     public double sgetTwist() {
-	return -scale(super.getTwist());
+	return scale(super.getTwist());
     }
 
     public double getThrottle() {
@@ -77,4 +71,3 @@ public class JsScaled extends Joystick {
     }
 
 }
-
