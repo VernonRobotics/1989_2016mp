@@ -83,6 +83,7 @@ public class ArcadeDriveCmd implements cmd {
 	public void teleopPeriodic() {
 		// TODO Auto-generated method stub
 		rd.arcadeDrive(driveStick.sgetY(), driveStick.sgetTwist());
+	    SmartDashboard.putString("DB/String 6", "Acc X " + driveStick.sgetY());
 	}
 
 	@Override

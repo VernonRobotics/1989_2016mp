@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -27,19 +28,19 @@ public class Robot extends IterativeRobot {
 	
 	double driveramp = 6.0;
 	
-	CANTalon frontleftmotor = new CANTalon(0);
-	CANTalon frontrightmotor = new CANTalon(1);
+	CANTalon frontleftmotor = new CANTalon(3);
+	CANTalon frontrightmotor = new CANTalon(9);
 	CANTalon backleftmotor = new CANTalon(2);
 	CANTalon backrightmotor = new CANTalon(3);
 	
 	
     JsScaled utilityStick = new JsScaled(0);
     JsScaled driveStick = new JsScaled(1);
-    ArcadeDriveCmd aDrive = new ArcadeDriveCmd(frontleftmotor, frontrightmotor, backleftmotor, backrightmotor, driveStick);
+    ArcadeDriveCmd aDrive = new ArcadeDriveCmd(frontleftmotor, frontrightmotor, driveStick);
     ArrayList<cmd> cmdlist = new ArrayList<cmd>();
+    Joystick js = new Joystick(0);
     
-    
-   
+   RobotDrive drive = new RobotDrive(frontleftmotor, frontrightmotor);
    
     
     
@@ -89,7 +90,8 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during test mode
      */
     public void testPeriodic() {
-    
+  drive.arcadeDrive(driveStick.sgetY(),driveStick.sgetX());
+//    	frontrightmotor.set(0.5);
     }
     
 }
