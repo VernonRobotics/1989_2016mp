@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -27,19 +28,19 @@ public class Robot extends IterativeRobot {
 	
 	double driveramp = 6.0;
 	
-	CANTalon frontleftmotor = new CANTalon(0);
-	CANTalon frontrightmotor = new CANTalon(1);
+	CANTalon frontleftmotor = new CANTalon(3);
+	CANTalon frontrightmotor = new CANTalon(9);
 	CANTalon backleftmotor = new CANTalon(2);
 	CANTalon backrightmotor = new CANTalon(3);
+	Timer t1 = new Timer();
 	
-	
-    JsScaled utilityStick = new JsScaled(0);
-    JsScaled driveStick = new JsScaled(1);
-    ArcadeDriveCmd aDrive = new ArcadeDriveCmd(frontleftmotor, frontrightmotor, backleftmotor, backrightmotor, driveStick);
+ //   JsScaled utilityStick = new JsScaled(1);
+    JsScaled driveStick = new JsScaled(0);
+    ArcadeDriveCmd aDrive = new ArcadeDriveCmd(frontleftmotor, frontrightmotor, driveStick);
     ArrayList<cmd> cmdlist = new ArrayList<cmd>();
+    Joystick js = new Joystick(0);
     
-    
-   
+   RobotDrive drive = new RobotDrive(frontleftmotor, frontrightmotor);
    
     
     
@@ -85,11 +86,28 @@ public class Robot extends IterativeRobot {
     	}
     }
     
+    public void testInit()
+    
+    {t1.start();
+    	}
     /**
      * This function is called periodically during test mode
      */
     public void testPeriodic() {
-    
+  drive.arcadeDrive(0-driveStick.sgetY(),0-driveStick.sgetTwist());
+  if(t1.get() > .5){
+	  t1.reset();
+	  t1.start();
+	  SmartDashboard.putString("DB/String 0", " Left I " +frontleftmotor.getOutputCurrent())  ;
+	  SmartDashboard.putString("DB/String 5", "right I " + frontrightmotor.getOutputCurrent());
+	  SmartDashboard.putString("DB/String 1", " Left O " +frontleftmotor.getOutputVoltage())  ;
+	  SmartDashboard.putString("DB/String 6", "right O " + frontrightmotor.getOutputVoltage());
+	  SmartDashboard.putString("DB/String 2", " Left V " +frontleftmotor.getBusVoltage())  ;
+	  SmartDashboard.putString("DB/String 7", "right V " + frontrightmotor.getBusVoltage());
+	  SmartDashboard.putString("DB/String 3", " Left S " +frontleftmotor.getSpeed())  ;
+	  SmartDashboard.putString("DB/String 8", "right S " + frontrightmotor.getSpeed());
+  }
+
     }
     
 }
