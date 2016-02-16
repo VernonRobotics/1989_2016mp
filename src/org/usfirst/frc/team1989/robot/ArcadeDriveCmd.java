@@ -67,6 +67,7 @@ public class ArcadeDriveCmd implements cmd {
 
 	}
 
+	
 	@Override
 	public void testInit() {
 		// TODO Auto-generated method stub

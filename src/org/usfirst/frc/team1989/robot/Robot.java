@@ -92,6 +92,7 @@ public class Robot extends IterativeRobot {
     	}
     /**
      * This function is called periodically during test mode
+     * 
      */
     public void testPeriodic() {
   drive.arcadeDrive(0-driveStick.sgetY(),0-driveStick.sgetTwist());
