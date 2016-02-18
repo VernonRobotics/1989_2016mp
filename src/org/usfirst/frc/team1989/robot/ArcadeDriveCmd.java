@@ -44,6 +44,7 @@ public class ArcadeDriveCmd implements cmd {
 	@Override
 	public void disabledInit() {
 		// TODO Auto-generated method stub
+		rd.arcadeDrive(0, 0);
 
 	}
 
@@ -64,6 +65,7 @@ public class ArcadeDriveCmd implements cmd {
 	public void DisabledPeriodic() {
 		rd.arcadeDrive(0, 0);
 		// TODO Auto-generated method stub
+		rd.arcadeDrive(0, 0);
 
 	}
 

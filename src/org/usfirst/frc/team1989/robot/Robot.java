@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -32,7 +33,10 @@ public class Robot extends IterativeRobot {
 	CANTalon frontrightmotor = new CANTalon(9);
 	CANTalon backleftmotor = new CANTalon(2);
 	CANTalon backrightmotor = new CANTalon(3);
+	CANTalon shootmotor1 = new CANTalon(2);
+	CANTalon shootmotor2 = new CANTalon(8);
 	Timer t1 = new Timer();
+	Servo s1 =new Servo(0);
 	
  //   JsScaled utilityStick = new JsScaled(1);
     JsScaled driveStick = new JsScaled(0);
@@ -41,15 +45,20 @@ public class Robot extends IterativeRobot {
     Joystick js = new Joystick(0);
     
    RobotDrive drive = new RobotDrive(frontleftmotor, frontrightmotor);
+   Shooter shooter = new Shooter(shootmotor1, shootmotor2, driveStick);
    
     
     
     public void robotInit() {
     	cmdlist.add(aDrive);
+    	cmdlist.add(shooter);
     	frontleftmotor.enableLimitSwitch(false, false);
     	frontrightmotor.enableLimitSwitch(false, false);
     	backleftmotor.enableLimitSwitch(false, false);
     	backrightmotor.enableLimitSwitch(false, false);
+    	shootmotor1.enableLimitSwitch(false, false);
+    	shootmotor2.enableLimitSwitch(false, false);
+    	
     	
     	frontleftmotor.setVoltageRampRate(driveramp);
     	frontrightmotor.setVoltageRampRate(driveramp);
@@ -96,6 +105,13 @@ public class Robot extends IterativeRobot {
      */
     public void testPeriodic() {
   drive.arcadeDrive(0-driveStick.sgetY(),0-driveStick.sgetTwist());
+  
+  if(driveStick.getRawButton(5) == true){
+	  s1.set(0);
+  }
+  else if(driveStick.getRawButton(6) == true){
+	  s1.set(1);
+  } 
   if(t1.get() > .5){
 	  t1.reset();
 	  t1.start();
