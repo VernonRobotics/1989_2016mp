@@ -31,10 +31,11 @@ public class Robot extends IterativeRobot {
 	
 	CANTalon frontleftmotor = new CANTalon(3);
 	CANTalon frontrightmotor = new CANTalon(9);
-	CANTalon backleftmotor = new CANTalon(2);
-	CANTalon backrightmotor = new CANTalon(3);
-	CANTalon shootmotor1 = new CANTalon(2);
+	CANTalon backleftmotor = new CANTalon(6);
+	CANTalon backrightmotor = new CANTalon(7);
+	CANTalon shootmotor1 = new CANTalon(4);
 	CANTalon shootmotor2 = new CANTalon(8);
+	CANTalon elevator = new CANTalon(5);
 	Timer t1 = new Timer();
 	Servo s1 =new Servo(0);
 	
@@ -86,6 +87,14 @@ public class Robot extends IterativeRobot {
   	
     }
 
+	public void DisabledPeriodic() {
+		drive.arcadeDrive(0, 0);
+		elevator.set(0);
+		shootmotor1.set(-0.7);
+		shootmotor2.set(0.7);
+	}
+
+
     /**
      * This function is called periodically during operator control
      */
@@ -112,7 +121,33 @@ public class Robot extends IterativeRobot {
   else if(driveStick.getRawButton(6) == true){
 	  s1.set(1);
   } 
-  if(t1.get() > .5){
+	if(driveStick.getRawButton(2) == true){
+		shootmotor1.set(-.3);
+		shootmotor2.set(.3);
+	}
+	else if (driveStick.getRawButton(1)){
+		shootmotor1.set(1);
+		shootmotor2.set(-1);
+	}
+	else
+	{
+		shootmotor1.set(0);
+		shootmotor2.set(0);
+		
+	}
+	
+	if(driveStick.getRawButton(3) == true){
+		elevator.set(.2);
+	}
+	else if (driveStick.getRawButton(4)){
+		elevator.set(-.2);
+	}
+	else
+	{
+		elevator.set(0);
+	}
+
+  if(t1.get() > .25){
 	  t1.reset();
 	  t1.start();
 	  SmartDashboard.putString("DB/String 0", " Left I " +frontleftmotor.getOutputCurrent())  ;
@@ -121,8 +156,10 @@ public class Robot extends IterativeRobot {
 	  SmartDashboard.putString("DB/String 6", "right O " + frontrightmotor.getOutputVoltage());
 	  SmartDashboard.putString("DB/String 2", " Left V " +frontleftmotor.getBusVoltage())  ;
 	  SmartDashboard.putString("DB/String 7", "right V " + frontrightmotor.getBusVoltage());
-	  SmartDashboard.putString("DB/String 3", " Left S " +frontleftmotor.getSpeed())  ;
-	  SmartDashboard.putString("DB/String 8", "right S " + frontrightmotor.getSpeed());
+	  SmartDashboard.putString("DB/String 3", " Enc pos " +elevator.getEncPosition() )  ;
+	  SmartDashboard.putString("DB/String 8", "getpos" + elevator.getPosition());
+	  SmartDashboard.putString("DB/String 4", " sh1 I " +shootmotor1.getOutputCurrent())  ;
+	  SmartDashboard.putString("DB/String 9", "right S " + shootmotor2.getOutputCurrent());
   }
 
     }
