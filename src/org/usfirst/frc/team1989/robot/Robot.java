@@ -41,16 +41,17 @@ public class Robot extends IterativeRobot {
 	
  //   JsScaled utilityStick = new JsScaled(1);
     JsScaled driveStick = new JsScaled(0);
-    ArcadeDriveCmd aDrive = new ArcadeDriveCmd(frontleftmotor, frontrightmotor, driveStick);
+    ArcadeDriveCmd aDrive = new ArcadeDriveCmd(frontleftmotor,backleftmotor,  frontrightmotor, backrightmotor,  driveStick);
     ArrayList<cmd> cmdlist = new ArrayList<cmd>();
     Joystick js = new Joystick(0);
     
-   RobotDrive drive = new RobotDrive(frontleftmotor, frontrightmotor);
+   RobotDrive drive = new RobotDrive(frontleftmotor,backleftmotor,  frontrightmotor, backrightmotor);
    Shooter shooter = new Shooter(shootmotor1, shootmotor2, driveStick);
    
     
     
     public void robotInit() {
+    	System.out.println("i'm Alive");
     	cmdlist.add(aDrive);
     	cmdlist.add(shooter);
     	frontleftmotor.enableLimitSwitch(false, false);
@@ -122,8 +123,8 @@ public class Robot extends IterativeRobot {
 	  s1.set(1);
   } 
 	if(driveStick.getRawButton(2) == true){
-		shootmotor1.set(-.3);
-		shootmotor2.set(.3);
+		shootmotor1.set(-.35);
+		shootmotor2.set(.35);
 	}
 	else if (driveStick.getRawButton(1)){
 		shootmotor1.set(1);
@@ -144,10 +145,10 @@ public class Robot extends IterativeRobot {
 	}
 	else
 	{
-		elevator.set(0);
+		elevator.set(-.05);
 	}
 
-  if(t1.get() > .25){
+  if(t1.get() > .25 && false){
 	  t1.reset();
 	  t1.start();
 	  SmartDashboard.putString("DB/String 0", " Left I " +frontleftmotor.getOutputCurrent())  ;
