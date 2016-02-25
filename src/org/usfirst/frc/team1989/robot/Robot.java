@@ -1,4 +1,6 @@
 
+//Martin's Code
+
 package org.usfirst.frc.team1989.robot;
 
 import java.util.ArrayList;
@@ -21,148 +23,173 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class Robot extends IterativeRobot {
-   
-    /**
-     * This function is run when the robot is first started up and should be
-     * used for any initialization code.
-     */
-	
+
+	/**
+	 * This function is run when the robot is first started up and should be
+	 * used for any initialization code.
+	 */
+
 	double driveramp = 6.0;
-	
-	CANTalon frontleftmotor = new CANTalon(3);
-	CANTalon frontrightmotor = new CANTalon(9);
-	CANTalon backleftmotor = new CANTalon(6);
-	CANTalon backrightmotor = new CANTalon(7);
-	CANTalon shootmotor1 = new CANTalon(4);
-	CANTalon shootmotor2 = new CANTalon(8);
+
+	// Instantiating Talon Motors
+	CANTalon frontLeftMotor = new CANTalon(3);
+	CANTalon frontRightMotor = new CANTalon(9);
+	CANTalon rearLeftMotor = new CANTalon(6);
+	CANTalon rearRightMotor = new CANTalon(7);
+	CANTalon shootMotor1 = new CANTalon(4);
+	CANTalon shootMotor2 = new CANTalon(8);
 	CANTalon elevator = new CANTalon(5);
-	Timer t1 = new Timer();
-	Servo s1 =new Servo(0);
+	String[] lastmsg = new String[10];
+	Boolean[] lastled = new Boolean[5];
+	String[] msg = new String[10];
+	Boolean[] led = new Boolean[5];
 	
- //   JsScaled utilityStick = new JsScaled(1);
-    JsScaled driveStick = new JsScaled(0);
-    ArcadeDriveCmd aDrive = new ArcadeDriveCmd(frontleftmotor,backleftmotor,  frontrightmotor, backrightmotor,  driveStick);
-    ArrayList<cmd> cmdlist = new ArrayList<cmd>();
-    Joystick js = new Joystick(0);
-    
-   RobotDrive drive = new RobotDrive(frontleftmotor,backleftmotor,  frontrightmotor, backrightmotor);
-   Shooter shooter = new Shooter(shootmotor1, shootmotor2, driveStick);
-   
-    
-    
-    public void robotInit() {
-    	System.out.println("i'm Alive");
-    	cmdlist.add(aDrive);
-    	cmdlist.add(shooter);
-    	frontleftmotor.enableLimitSwitch(false, false);
-    	frontrightmotor.enableLimitSwitch(false, false);
-    	backleftmotor.enableLimitSwitch(false, false);
-    	backrightmotor.enableLimitSwitch(false, false);
-    	shootmotor1.enableLimitSwitch(false, false);
-    	shootmotor2.enableLimitSwitch(false, false);
-    	
-    	
-    	frontleftmotor.setVoltageRampRate(driveramp);
-    	frontrightmotor.setVoltageRampRate(driveramp);
-    	backleftmotor.setVoltageRampRate(driveramp);
-    	backrightmotor.setVoltageRampRate(driveramp);
-    	    	
-    }
+	// Instantiating Timer
+	Timer t1 = new Timer();
+	
+	// Instantiating Servo
+	Servo s1 = new Servo(0);
 
-    public void autonomousInit() {
-    	for (int i = 0; i < cmdlist.size(); i++) {
-    	    cmdlist.get(i).autonomousInit();
-    	}
-    	
-    	
-    	    }
+	// Instantiating Joysticks
+	JsScaled driveStick = new JsScaled(0);
+	
+	// ArcadeDriveCMD Constructor - 4 motors
+	ArcadeDriveCmd aDrive = new ArcadeDriveCmd(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor,
+			driveStick);
+	writemessage wmsg = new writemessage();
+	// CMD List - Stores objects of each class to be run.
+	public ArrayList<a_cmd> cmdlist = new ArrayList<a_cmd>();
+	
+	Shooter shooter = new Shooter(shootMotor1, shootMotor2, driveStick);
 
-    /**
-     * This function is called periodically during autonomous
-     */
-    public void autonomousPeriodic() {
-    	for (int i = 0; i < cmdlist.size(); i++) {
-    	    cmdlist.get(i).autonomousPeriodic();
-    	}
-    	
-  	
-    }
+	public void robotInit() {
+		
+		System.out.println("i'm Alive");
+		
+		// Construct CMD List
+		cmdlist.add( aDrive);
+		cmdlist.add(shooter);
+		
+		cmdlist.add(wmsg);  // sb added last so that other objects can update first
+		
+		// Limit Switches
+		frontLeftMotor.enableLimitSwitch(false, false);
+		frontRightMotor.enableLimitSwitch(false, false);
+		rearLeftMotor.enableLimitSwitch(false, false);
+		rearRightMotor.enableLimitSwitch(false, false);
+		shootMotor1.enableLimitSwitch(false, false);
+		shootMotor2.enableLimitSwitch(false, false);
+
+		// Voltage Ramps - none for now
+//		frontLeftMotor.setVoltageRampRate(driveramp);
+//		frontRightMotor.setVoltageRampRate(driveramp);
+//		rearLeftMotor.setVoltageRampRate(driveramp);
+//		rearRightMotor.setVoltageRampRate(driveramp);
+
+//add ref to list
+		for (int i = 0; i < cmdlist.size(); i++) {
+			cmdlist.get(i).cmdlist = cmdlist;
+		}
+
+
+	}
+
+	// 
+	public void autonomousInit() {
+		for (int i = 0; i < cmdlist.size(); i++) {
+			cmdlist.get(i).autonomousInit();
+		}
+
+	}
+
+	/**
+	 * This function is called periodically during autonomous
+	 */
+	public void autonomousPeriodic() {
+		for (int i = 0; i < cmdlist.size(); i++) {
+			cmdlist.get(i).autonomousPeriodic();
+		}
+
+	}
 
 	public void DisabledPeriodic() {
-		drive.arcadeDrive(0, 0);
-		elevator.set(0);
-		shootmotor1.set(-0.7);
-		shootmotor2.set(0.7);
-	}
-
-
-    /**
-     * This function is called periodically during operator control
-     */
-    public void teleopPeriodic() {
-    	for (int i = 0; i < cmdlist.size(); i++) {
-    	    cmdlist.get(i).teleopPeriodic();
-    	}
-    }
-    
-    public void testInit()
-    
-    {t1.start();
-    	}
-    /**
-     * This function is called periodically during test mode
-     * 
-     */
-    public void testPeriodic() {
-  drive.arcadeDrive(0-driveStick.sgetY(),0-driveStick.sgetTwist());
-  
-  if(driveStick.getRawButton(5) == true){
-	  s1.set(0);
-  }
-  else if(driveStick.getRawButton(6) == true){
-	  s1.set(1);
-  } 
-	if(driveStick.getRawButton(2) == true){
-		shootmotor1.set(-.35);
-		shootmotor2.set(.35);
-	}
-	else if (driveStick.getRawButton(1)){
-		shootmotor1.set(1);
-		shootmotor2.set(-1);
-	}
-	else
-	{
-		shootmotor1.set(0);
-		shootmotor2.set(0);
 		
+		//  In disabled, all speeds should be set to 0
+		elevator.set(0);
+		shootMotor1.set(0);
+		shootMotor2.set(0);
 	}
-	
-	if(driveStick.getRawButton(3) == true){
-		elevator.set(.2);
+
+	/**
+	 * This function is called periodically during operator control
+	 */
+	public void teleopPeriodic() {
+		for (int i = 0; i < cmdlist.size(); i++) {
+			cmdlist.get(i).teleopPeriodic();
+		}
 	}
-	else if (driveStick.getRawButton(4)){
-		elevator.set(-.2);
-	}
-	else
+
+	public void testInit()
+
 	{
-		elevator.set(-.05);
+		t1.start();
 	}
 
-  if(t1.get() > .25 && false){
-	  t1.reset();
-	  t1.start();
-	  SmartDashboard.putString("DB/String 0", " Left I " +frontleftmotor.getOutputCurrent())  ;
-	  SmartDashboard.putString("DB/String 5", "right I " + frontrightmotor.getOutputCurrent());
-	  SmartDashboard.putString("DB/String 1", " Left O " +frontleftmotor.getOutputVoltage())  ;
-	  SmartDashboard.putString("DB/String 6", "right O " + frontrightmotor.getOutputVoltage());
-	  SmartDashboard.putString("DB/String 2", " Left V " +frontleftmotor.getBusVoltage())  ;
-	  SmartDashboard.putString("DB/String 7", "right V " + frontrightmotor.getBusVoltage());
-	  SmartDashboard.putString("DB/String 3", " Enc pos " +elevator.getEncPosition() )  ;
-	  SmartDashboard.putString("DB/String 8", "getpos" + elevator.getPosition());
-	  SmartDashboard.putString("DB/String 4", " sh1 I " +shootmotor1.getOutputCurrent())  ;
-	  SmartDashboard.putString("DB/String 9", "right S " + shootmotor2.getOutputCurrent());
-  }
+	/**
+	 * This function is called periodically during test mode
+	 * 
+	 */
+	public void testPeriodic() {
+		// adrive.arcadeDrive(0-driveStick.sgetY(),0-driveStick.sgetTwist());
 
-    }
-    
+		// Servo Logic
+		if (driveStick.getRawButton(5) == true) {
+			s1.set(0);
+		} else if (driveStick.getRawButton(6) == true) {
+			s1.set(1);
+		}
+		
+		// Shooting Logic
+		if (driveStick.getRawButton(2) == true) {
+			
+			// Motors for pickup
+			shootMotor1.set(-.35);
+			shootMotor2.set(.35);
+		} else if (driveStick.getRawButton(1)) {
+			
+			// Motors for shoot
+			shootMotor1.set(1);
+			shootMotor2.set(-1);
+		} else {
+			shootMotor1.set(0);
+			shootMotor2.set(0);
+		}
+
+		// Elevator Logic
+		if (driveStick.getRawButton(3) == true) {
+			elevator.set(.2);
+		} else if (driveStick.getRawButton(4)) {
+			elevator.set(-.2);
+		} else {
+			elevator.set(-.05);
+		}
+
+		// Debug Output
+		if (t1.get() > .25 && false) {
+			t1.reset();
+			t1.start();
+			SmartDashboard.putString("DB/String 0", " Left I " + frontLeftMotor.getOutputCurrent());
+			SmartDashboard.putString("DB/String 5", "right I " + frontRightMotor.getOutputCurrent());
+			SmartDashboard.putString("DB/String 1", " Left O " + frontLeftMotor.getOutputVoltage());
+			SmartDashboard.putString("DB/String 6", "right O " + frontRightMotor.getOutputVoltage());
+			SmartDashboard.putString("DB/String 2", " Left V " + frontLeftMotor.getBusVoltage());
+			SmartDashboard.putString("DB/String 7", "right V " + frontRightMotor.getBusVoltage());
+			SmartDashboard.putString("DB/String 3", " Enc pos " + elevator.getEncPosition());
+			SmartDashboard.putString("DB/String 8", "getpos" + elevator.getPosition());
+			SmartDashboard.putString("DB/String 4", " sh1 I " + shootMotor1.getOutputCurrent());
+			SmartDashboard.putString("DB/String 9", "right S " + shootMotor2.getOutputCurrent());
+		}
+
+	}
+
 }

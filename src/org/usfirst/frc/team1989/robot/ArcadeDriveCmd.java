@@ -2,13 +2,14 @@ package org.usfirst.frc.team1989.robot;
 
 import java.util.ArrayList;
 
+import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class ArcadeDriveCmd implements cmd {
+public class ArcadeDriveCmd extends a_cmd {
 
 	public String type = "arcadeDriveCmd";
 	public ArrayList<cmd> list;
@@ -18,10 +19,10 @@ public class ArcadeDriveCmd implements cmd {
 	
 	
 	/*
-	 * Main controller for use.  Based on 4 motors anda  speed controller.
+	 * Main controller for use.  Basasd on 4 motors anda  speed controller.
 	 */
-	public ArcadeDriveCmd(int leftMotorChannel, int rightMotorChannel, JsScaled driveStick) {
-		rd = new RobotDrive(leftMotorChannel, rightMotorChannel);
+	public ArcadeDriveCmd(int frontLeftMotor, int rearLeftMotor, int frontRightMotor, int rearRightMotor, JsScaled driveStick) {
+		rd = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
 		this.driveStick = driveStick;
 	}
 		
@@ -30,21 +31,27 @@ public class ArcadeDriveCmd implements cmd {
 		rd = new RobotDrive(leftMotor, rightMotor);
 		this.driveStick = driveStick;
 	}
-	public ArcadeDriveCmd(int frontLeftMotor, int rearLeftMotor, int frontRightMotor, int rearRightMotor, JsScaled driveStick) {
-		rd = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
+	public ArcadeDriveCmd(int leftMotorChannel, int rightMotorChannel, JsScaled driveStick) {
+		rd = new RobotDrive(leftMotorChannel, rightMotorChannel);
 		this.driveStick = driveStick;
 	}
+	
 	
 	public ArcadeDriveCmd(SpeedController frontLeftMotor, SpeedController rearLeftMotor, SpeedController frontRightMotor, SpeedController rearRightMotor, JsScaled driveStick) {
 		rd = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
 		this.driveStick = driveStick;
 	}
-
 	
+	// Autonomous Function - Arcade Drive dependency
+	public void arcadeDrive(double magnitude, double twist){
+		
+		rd.arcadeDrive(magnitude, twist);
+	}
+
 	@Override
 	public void disabledInit() {
 		// TODO Auto-generated method stub
-		rd.arcadeDrive(0, 0);
+		arcadeDrive(0, 0);
 
 	}
 
@@ -56,17 +63,15 @@ public class ArcadeDriveCmd implements cmd {
 
 	@Override
 	public void autonomousPeriodic() {
-		rd.arcadeDrive(driveStick.pY, driveStick.pTwist);
+		
+		arcadeDrive(driveStick.pY, driveStick.pTwist);
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void DisabledPeriodic() {
-		rd.arcadeDrive(0, 0);
-		// TODO Auto-generated method stub
-		rd.arcadeDrive(0, 0);
-
+		arcadeDrive(0, 0);
 	}
 
 	
@@ -85,14 +90,13 @@ public class ArcadeDriveCmd implements cmd {
 	@Override
 	public void teleopPeriodic() {
 		// TODO Auto-generated method stub
-		rd.arcadeDrive(0 - driveStick.sgetY(), 0-driveStick.sgetTwist());
+		arcadeDrive(0 - driveStick.sgetY(), 0-driveStick.sgetTwist());
 	}
 
 	@Override
 	public void testPeriodic() {
 		// TODO Auto-generated method stub
-		if (driveStick.getRawButton(1) == true){
-			
-		}
+		arcadeDrive(0 - driveStick.sgetY(), 0-driveStick.sgetTwist());
+		
 	}
 }

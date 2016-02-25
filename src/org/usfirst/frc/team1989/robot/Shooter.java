@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
 
-public class Shooter implements cmd {
+public class Shooter  extends a_cmd{
 
 	public CANTalon shootMotor1;
 	public CANTalon shootMotor2;

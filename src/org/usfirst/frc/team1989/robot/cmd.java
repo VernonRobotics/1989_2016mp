@@ -3,9 +3,6 @@ package org.usfirst.frc.team1989.robot;
 import java.util.ArrayList;
 
 public interface cmd {
-	public String type = ""; // holds class type
-	public ArrayList<cmd> list = new ArrayList<cmd>();
-	   
     public void disabledInit();
     
     
