@@ -58,19 +58,43 @@ public class Robot extends IterativeRobot {
 			driveStick);
 	writemessage wmsg = new writemessage();
 	// CMD List - Stores objects of each class to be run.
-	public ArrayList<a_cmd> cmdlist = new ArrayList<a_cmd>();
 	
 	Shooter shooter = new Shooter(shootMotor1, shootMotor2, driveStick);
+	public static class sharedStuff{
+		public static ArrayList<a_cmd> cmdlist = new ArrayList<a_cmd>();
+		public static String[] msg = new String[10] ;
+		public static Boolean[] led = new Boolean[5];
+		public static String[] lastmsg = new String[10];
+		public static Boolean[] lastled = new Boolean[5];
+
+
+		/*
+		    * returns an a_cmd with type stringcmd
+		    */
+		public static a_cmd findcmd(String cmd)
+		{
+			
+			for (int i = 0; i < cmdlist.size(); i++) {
+				 if (cmdlist.get(i).type == cmd){
+					 return cmdlist.get(i);
+				 };
+			}
+
+			return null;
+		}
+
+	}
+	
 
 	public void robotInit() {
 		
 		System.out.println("i'm Alive");
 		
 		// Construct CMD List
-		cmdlist.add( aDrive);
-		cmdlist.add(shooter);
+		sharedStuff.cmdlist.add( aDrive);
+		sharedStuff.cmdlist.add(shooter);
 		
-		cmdlist.add(wmsg);  // sb added last so that other objects can update first
+		sharedStuff.cmdlist.add(wmsg);  // sb added last so that other objects can update first
 		
 		// Limit Switches
 		frontLeftMotor.enableLimitSwitch(false, false);
@@ -87,17 +111,14 @@ public class Robot extends IterativeRobot {
 //		rearRightMotor.setVoltageRampRate(driveramp);
 
 //add ref to list
-		for (int i = 0; i < cmdlist.size(); i++) {
-			cmdlist.get(i).cmdlist = cmdlist;
-		}
 
 
 	}
 
 	// 
 	public void autonomousInit() {
-		for (int i = 0; i < cmdlist.size(); i++) {
-			cmdlist.get(i).autonomousInit();
+		for (int i = 0; i < sharedStuff.cmdlist.size(); i++) {
+			sharedStuff.cmdlist.get(i).autonomousInit();
 		}
 
 	}
@@ -106,8 +127,8 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during autonomous
 	 */
 	public void autonomousPeriodic() {
-		for (int i = 0; i < cmdlist.size(); i++) {
-			cmdlist.get(i).autonomousPeriodic();
+		for (int i = 0; i < sharedStuff.cmdlist.size(); i++) {
+			sharedStuff.cmdlist.get(i).autonomousPeriodic();
 		}
 
 	}
@@ -124,8 +145,8 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during operator control
 	 */
 	public void teleopPeriodic() {
-		for (int i = 0; i < cmdlist.size(); i++) {
-			cmdlist.get(i).teleopPeriodic();
+		for (int i = 0; i < sharedStuff.cmdlist.size(); i++) {
+			sharedStuff.cmdlist.get(i).teleopPeriodic();
 		}
 	}
 

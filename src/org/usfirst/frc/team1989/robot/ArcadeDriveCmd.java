@@ -24,6 +24,7 @@ public class ArcadeDriveCmd extends a_cmd {
 	public ArcadeDriveCmd(int frontLeftMotor, int rearLeftMotor, int frontRightMotor, int rearRightMotor, JsScaled driveStick) {
 		rd = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
 		this.driveStick = driveStick;
+
 	}
 		
 	// Included for completeness, but unused

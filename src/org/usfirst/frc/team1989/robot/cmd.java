@@ -3,6 +3,7 @@ package org.usfirst.frc.team1989.robot;
 import java.util.ArrayList;
 
 public interface cmd {
+	
     public void disabledInit();
     
     
@@ -18,5 +19,7 @@ public interface cmd {
     public void teleopInit();
     public void teleopPeriodic() ;
     public void testPeriodic() ;
-    
+
+	public ArrayList<autocmd> auto_list = new ArrayList<autocmd>(); // list of auto commands
+
 }

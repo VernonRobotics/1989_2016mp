@@ -19,7 +19,6 @@ public class Shooter  extends a_cmd{
 		this.shootMotor1 = shootMotor1;
 		this.shootMotor2 = shootMotor2;
 		this.driveStick = driveStick;
-		
 	}
 
 
