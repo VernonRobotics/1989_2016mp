@@ -161,8 +161,8 @@ public class Robot extends IterativeRobot {
 	 * 
 	 */
 	public void testPeriodic() {
-		// adrive.arcadeDrive(0-driveStick.sgetY(),0-driveStick.sgetTwist());
-
+	 aDrive.testPeriodic();
+wmsg.testPeriodic();
 		// Servo Logic
 		if (driveStick.getRawButton(5) == true) {
 			s1.set(0);
@@ -196,20 +196,16 @@ public class Robot extends IterativeRobot {
 		}
 
 		// Debug Output
-		if (t1.get() > .25 && false) {
-			t1.reset();
-			t1.start();
-			SmartDashboard.putString("DB/String 0", " Left I " + frontLeftMotor.getOutputCurrent());
-			SmartDashboard.putString("DB/String 5", "right I " + frontRightMotor.getOutputCurrent());
-			SmartDashboard.putString("DB/String 1", " Left O " + frontLeftMotor.getOutputVoltage());
-			SmartDashboard.putString("DB/String 6", "right O " + frontRightMotor.getOutputVoltage());
-			SmartDashboard.putString("DB/String 2", " Left V " + frontLeftMotor.getBusVoltage());
-			SmartDashboard.putString("DB/String 7", "right V " + frontRightMotor.getBusVoltage());
-			SmartDashboard.putString("DB/String 3", " Enc pos " + elevator.getEncPosition());
-			SmartDashboard.putString("DB/String 8", "getpos" + elevator.getPosition());
-			SmartDashboard.putString("DB/String 4", " sh1 I " + shootMotor1.getOutputCurrent());
-			SmartDashboard.putString("DB/String 9", "right S " + shootMotor2.getOutputCurrent());
-		}
+			sharedStuff.msg[0] =" Left I " + frontLeftMotor.getOutputCurrent();
+			sharedStuff.msg[5] = "right I " + frontRightMotor.getOutputCurrent();
+			sharedStuff.msg[1] =" Left O " + frontLeftMotor.getOutputVoltage();
+			sharedStuff.msg[6] = "right O " + frontRightMotor.getOutputVoltage();
+			sharedStuff.msg[2] = " Left V " + frontLeftMotor.getBusVoltage();
+			sharedStuff.msg[7] = "right V " + frontRightMotor.getBusVoltage();
+			sharedStuff.msg[3] = " Enc pos " + elevator.getEncPosition();
+			sharedStuff.msg[8] = "getpos" + elevator.getPosition();
+			sharedStuff.msg[4] = " sh1 I " + shootMotor1.getOutputCurrent();
+			sharedStuff.msg[9] = "right S " + shootMotor2.getOutputCurrent();
 
 	}
 
