@@ -1,83 +1,52 @@
 package org.usfirst.frc.team1989.robot;
 
-import org.usfirst.frc.team1989.robot.Robot.sharedStuff;
-
+// All Imports - Will remove unecessary later
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Shooter  extends a_cmd{
 
-	public CANTalon shootMotor1;
-	public CANTalon shootMotor2;
+public class Shooter extends  a_cmd {
+	
+	CANTalon shootMotor1;
+	CANTalon shootMotor2;
+	CANTalon elevator;
 	JsScaled driveStick;
-	int TalonID1;
-	int TalonID2;
+	Servo s1;
 	Timer t1 = new Timer();
 	int lastaction = 0; //0 off, 1 pickup 2 spinup
 	double lasti =0.0; //last current	
 	double nexttimer = 0.0;
-	 
 	
-	
-	public Shooter(CANTalon shootMotor1,CANTalon shootMotor2,JsScaled driveStick){
+	public Shooter(CANTalon shootMotor1, CANTalon shootMotor2, CANTalon elevator, JsScaled driveStick, Servo s1){
 		this.shootMotor1 = shootMotor1;
 		this.shootMotor2 = shootMotor2;
+		this.elevator = elevator;
 		this.driveStick = driveStick;
+		this.s1 = s1;
+		
 	}
-
-
-	@Override
 	
+	public void elevatorOperation(){
+		if(driveStick.getPOV(0) == 180){
+			elevator.set(.2);
+		}else if(driveStick.getPOV(0) == 0){
+			elevator.set(-.2);
+		}else{
+			elevator.set(0);
+		}
+		
+	}
 	
-	
-	public void disabledInit() {
-		// TODO Auto-generated method stub
-		shootMotor1.set(0);
-		shootMotor2.set(0);
-		
-	}
-
-	@Override
-	public void autonomousInit() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void autonomousPeriodic() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void DisabledPeriodic() {
-		// TODO Auto-generated method stub
-			shootMotor1.set(0);
-			shootMotor2.set(0);
-		
-	}
-
-	@Override
-	public void testInit() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void teleopInit() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void teleopPeriodic() {
-		// TODO Auto-generated method stub
-		// if neither 3 or 1 is pressed we turn off - this is for test only
-		// we need a logic to turn it off too or it shuts off after a while
+	public void shootMotorOperation(){
 		//so the shooter needs a timer and a state and some logic depending on state
-		sharedStuff.msg[0] =" Left s I " + shootMotor1.getOutputCurrent();
-		sharedStuff.msg[5] = "right s I " + shootMotor2.getOutputCurrent();
+		Robot.sharedStuff.msg[0] =" Left s I " + shootMotor1.getOutputCurrent();
+		Robot.sharedStuff.msg[5] = "right s I " + shootMotor2.getOutputCurrent();
 
 		if(driveStick.getRawButton(2) == true){
 			this.lastaction = 1;
@@ -112,25 +81,38 @@ public class Shooter  extends a_cmd{
 		}
 		
 	}
+	
+	public void servoOperation(){
+		
+		if(driveStick.getRawButton(1) == true){
+			s1.set(1);
+			t1.start();
+			
+			
+		}
+	}
+	/* Teleop Init and Teleop Periodic */
+	public void teleopInit(){
+		// Once we have a limit switch then make the elevator start at the bottom.
+		s1.set(0);
+	}
+    public void teleopPeriodic(){
+    	if(t1.get() > .2 ){
+    		s1.set(0);
+    		t1.stop();
+    		t1.reset();
+    	}
+		
+    	servoOperation();
+    	elevatorOperation();
+    	shootMotorOperation();
+    }
 
-	@Override
-	public void testPeriodic() {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public void pickupBall() {
-		if(driveStick.getRawButton(3) == true){
-			shootMotor1.set(0.2);
-			shootMotor2.set(-0.2);
-		}
-		
-	}
-	public void spinWheels(){
-		if (driveStick.getRawButton(1)){
-			shootMotor1.set(-0.7);
-			shootMotor2.set(0.7);
-		}
-	}
-	
+    
+    public void autonomousPeriodic(){}
+    public void DisabledPeriodic(){}
+    public void testInit(){}
+    public void testPeriodic(){}
+    public void disabledInit(){}
+    public void autonomousInit(){}
 }

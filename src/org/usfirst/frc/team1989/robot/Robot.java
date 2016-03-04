@@ -59,7 +59,7 @@ public class Robot extends IterativeRobot {
 	writemessage wmsg = new writemessage();
 	// CMD List - Stores objects of each class to be run.
 	
-	Shooter shooter = new Shooter(shootMotor1, shootMotor2, driveStick);
+	Shooter shooter = new Shooter(shootMotor1, shootMotor2, elevator, driveStick, s1);
 	public static class sharedStuff{
 		public static ArrayList<a_cmd> cmdlist = new ArrayList<a_cmd>();
 		public static String[] msg = new String[10] ;
@@ -206,7 +206,7 @@ wmsg.testPeriodic();
 			sharedStuff.msg[8] = "getpos" + elevator.getPosition();
 			sharedStuff.msg[4] = " sh1 I " + shootMotor1.getOutputCurrent();
 			sharedStuff.msg[9] = "right S " + shootMotor2.getOutputCurrent();
-
+frontLeftMotor.g
 	}
 
 }
