@@ -1,32 +1,19 @@
 package org.usfirst.frc.team1989.robot;
 
 // All Imports - Will remove unecessary later
-import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-
-public class Shooter extends  a_cmd {
+public class ShooterCmd extends a_cmd {
 	
-	CANTalon shootMotor1;
-	CANTalon shootMotor2;
-	CANTalon elevator;
 	JsScaled driveStick;
 	Servo s1;
 	Timer t1 = new Timer();
 	int lastaction = 0; //0 off, 1 pickup 2 spinup
-	double lasti =0.0; //last current	
-	double nexttimer = 0.0;
+	double lasti =0.000; //last current	
+	double nexttimer = 0.000;
 	
-	public Shooter(CANTalon shootMotor1, CANTalon shootMotor2, CANTalon elevator, JsScaled driveStick, Servo s1){
-		this.shootMotor1 = shootMotor1;
-		this.shootMotor2 = shootMotor2;
-		this.elevator = elevator;
+	public ShooterCmd (JsScaled driveStick, Servo s1){
 		this.driveStick = driveStick;
 		this.s1 = s1;
 		
@@ -34,37 +21,47 @@ public class Shooter extends  a_cmd {
 	
 	public void elevatorOperation(){
 		if(driveStick.getPOV(0) == 180){
-			elevator.set(.2);
+			elevator.set(.4);
 		}else if(driveStick.getPOV(0) == 0){
-			elevator.set(-.2);
+			elevator.set(-.4);
 		}else{
-			elevator.set(0);
+			elevator.set(-.04);
 		}
 		
 	}
 	
 	public void shootMotorOperation(){
 		//so the shooter needs a timer and a state and some logic depending on state
-		Robot.sharedStuff.msg[0] =" Left s I " + shootMotor1.getOutputCurrent();
-		Robot.sharedStuff.msg[5] = "right s I " + shootMotor2.getOutputCurrent();
+		SharedStuff.msg[0] =" Left s I " + shootMotor1.getOutputCurrent();
+		SharedStuff.msg[5] = "lasti " + lasti;
 
-		if(driveStick.getRawButton(2) == true){
+		if(driveStick.getRawButton(5) == true){
+			SharedStuff.led[1] = false;
 			this.lastaction = 1;
 			shootMotor1.set(-.35);
 			shootMotor2.set(.35);
-			Robot.sharedStuff.led[0] = false;		}
-		else if (driveStick.getRawButton(1)){
+			elevator.set(.5);
+			SharedStuff.led[0] = false;
+			lastaction = 0;
+			if (shootMotor1.isFwdLimitSwitchClosed())
+			{
+				SharedStuff.led[1] = true;
+			}
+			}
+		else if (driveStick.getRawButton(3)){
+			SharedStuff.led[1] = false;
 			if(lastaction != 2){
 				t1.stop();
 				t1.reset();
 				t1.start();
-				Robot.sharedStuff.led[0] = false;
-				nexttimer = 1.0;
+				nexttimer = t1.get() + 1.0;
+				lastaction = 2;
 			}
-			else if(t1.get() > nexttimer && !Robot.sharedStuff.led[0]){
+			else if(t1.get() > nexttimer && lastaction ==2){
 				nexttimer = t1.get() + .3;
-				if(lasti-.25 > shootMotor1.getOutputCurrent() && lasti+.25 > shootMotor1.getOutputCurrent()){
-					Robot.sharedStuff.led[0] = true;
+				if(Math.abs(lasti- shootMotor1.getOutputCurrent()) < 0.5){
+					SharedStuff.led[0] = true;
+					lastaction = 1;
 				}
 				lasti = shootMotor1.getOutputCurrent();
 			}
@@ -73,11 +70,12 @@ public class Shooter extends  a_cmd {
 		}
 		else
 		{
-			Robot.sharedStuff.led[0] = false;
+			lastaction = 0;
+			SharedStuff.led[0] = false;
 			shootMotor1.set(0);
 			shootMotor2.set(0);
 			this.lastaction = 0;
-			
+			SharedStuff.led[1] = false;
 		}
 		
 	}

@@ -16,8 +16,6 @@ public class ArcadeDriveCmd extends a_cmd {
 	JsScaled driveStick;
 	RobotDrive rd;
 
-	
-	
 	/*
 	 * Main controller for use.  Basasd on 4 motors anda  speed controller.
 	 */
@@ -44,16 +42,9 @@ public class ArcadeDriveCmd extends a_cmd {
 	}
 	
 	// Autonomous Function - Arcade Drive dependency
-	public void arcadeDrive(double magnitude, double twist){
+	public void arcadeDrive(double magnitude, double stwist){
 		
-		rd.arcadeDrive(magnitude, twist);
-	}
-
-	@Override
-	public void disabledInit() {
-		// TODO Auto-generated method stub
-		arcadeDrive(0, 0);
-
+		rd.arcadeDrive(magnitude, stwist);
 	}
 
 	@Override
@@ -70,12 +61,7 @@ public class ArcadeDriveCmd extends a_cmd {
 
 	}
 
-	@Override
-	public void DisabledPeriodic() {
-		arcadeDrive(0, 0);
-	}
-
-	
+		
 	@Override
 	public void testInit() {
 		// TODO Auto-generated method stub
@@ -91,13 +77,13 @@ public class ArcadeDriveCmd extends a_cmd {
 	@Override
 	public void teleopPeriodic() {
 		// TODO Auto-generated method stub
-		arcadeDrive(0 - driveStick.sgetY(), 0-driveStick.sgetTwist());
+		arcadeDrive(0 - driveStick.sgetY(), 0-driveStick.sgetTwist()*.75);
 	}
 
 	@Override
 	public void testPeriodic() {
 		// TODO Auto-generated method stub
-		arcadeDrive(0 - driveStick.sgetY(), 0-driveStick.sgetTwist());
+		arcadeDrive(0 - driveStick.sgetY(), 0-driveStick.sgetTwist()*.75);
 		
 	}
 }

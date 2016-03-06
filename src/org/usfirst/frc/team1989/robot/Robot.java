@@ -3,16 +3,12 @@
 
 package org.usfirst.frc.team1989.robot;
 
-import java.util.ArrayList;
-
-import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.AnalogAccelerometer;
+import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -22,81 +18,63 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
-public class Robot extends IterativeRobot {
+public class Robot extends a_cmd {
 
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
+	int state = 0;
 
 	double driveramp = 6.0;
 
-	// Instantiating Talon Motors
-	CANTalon frontLeftMotor = new CANTalon(3);
-	CANTalon frontRightMotor = new CANTalon(9);
-	CANTalon rearLeftMotor = new CANTalon(6);
-	CANTalon rearRightMotor = new CANTalon(7);
-	CANTalon shootMotor1 = new CANTalon(4);
-	CANTalon shootMotor2 = new CANTalon(8);
-	CANTalon elevator = new CANTalon(5);
-	String[] lastmsg = new String[10];
-	Boolean[] lastled = new Boolean[5];
-	String[] msg = new String[10];
-	Boolean[] led = new Boolean[5];
-	
 	// Instantiating Timer
 	Timer t1 = new Timer();
-	
+
 	// Instantiating Servo
 	Servo s1 = new Servo(0);
 
 	// Instantiating Joysticks
-	JsScaled driveStick = new JsScaled(0);
 	
+	
+	JsScaled driveStick = new JsScaled(0);
+	JsScaled uStick = new JsScaled(1);//The uStick will stand for the utility joystick responsible for shooting and arm movement
+	
+	//Instantiating writmessage
+	writemessage wmsg = new writemessage();
+
 	// ArcadeDriveCMD Constructor - 4 motors
 	ArcadeDriveCmd aDrive = new ArcadeDriveCmd(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor,
 			driveStick);
-	writemessage wmsg = new writemessage();
-	// CMD List - Stores objects of each class to be run.
+
+	// WHAT THE HECK IS THIS!!!! NO SUPPORT IN CLASSES!
+	// writemessage wmsg = new writemessage();
+
+	// RangeFinder
+
+	ShooterCmd shooter = new ShooterCmd(driveStick, s1);
+	ArmsCmd arms = new ArmsCmd(driveStick);
 	
-	Shooter shooter = new Shooter(shootMotor1, shootMotor2, elevator, driveStick, s1);
-	public static class sharedStuff{
-		public static ArrayList<a_cmd> cmdlist = new ArrayList<a_cmd>();
-		public static String[] msg = new String[10] ;
-		public static Boolean[] led = new Boolean[5];
-		public static String[] lastmsg = new String[10];
-		public static Boolean[] lastled = new Boolean[5];
-
-
-		/*
-		    * returns an a_cmd with type stringcmd
-		    */
-		public static a_cmd findcmd(String cmd)
-		{
-			
-			for (int i = 0; i < cmdlist.size(); i++) {
-				 if (cmdlist.get(i).type == cmd){
-					 return cmdlist.get(i);
-				 };
-			}
-
-			return null;
-		}
-
-	}
-	
+	ShooterCmd shooter2 = new ShooterCmd(uStick, s1);
+	ArmsCmd arms2 = new ArmsCmd(uStick);
 
 	public void robotInit() {
-		
+
 		System.out.println("i'm Alive");
-		
+		gyro = new AnalogGyro(1);
+		acc = new AnalogAccelerometer(0);
+		b_acc = new BuiltInAccelerometer();
 		// Construct CMD List
-		sharedStuff.cmdlist.add( aDrive);
-		sharedStuff.cmdlist.add(shooter);
-		
-		sharedStuff.cmdlist.add(wmsg);  // sb added last so that other objects can update first
-		
-		// Limit Switches
+		SharedStuff.cmdlist.add(aDrive);
+		SharedStuff.cmdlist.add(shooter);
+		SharedStuff.cmdlist.add(arms);
+		SharedStuff.cmdlist.add(shooter2);
+		SharedStuff.cmdlist.add(arms2);
+		SharedStuff.cmdlist.add(wmsg);
+		// SharedStuff.cmdlist.add(wmsg); // sb added last so that other objects
+		// can update first
+
+		// Limit Switches- In for now, will be changed to CAN network 
 		frontLeftMotor.enableLimitSwitch(false, false);
 		frontRightMotor.enableLimitSwitch(false, false);
 		rearLeftMotor.enableLimitSwitch(false, false);
@@ -105,20 +83,24 @@ public class Robot extends IterativeRobot {
 		shootMotor2.enableLimitSwitch(false, false);
 
 		// Voltage Ramps - none for now
-//		frontLeftMotor.setVoltageRampRate(driveramp);
-//		frontRightMotor.setVoltageRampRate(driveramp);
-//		rearLeftMotor.setVoltageRampRate(driveramp);
-//		rearRightMotor.setVoltageRampRate(driveramp);
+		// frontLeftMotor.setVoltageRampRate(driveramp);
+		// frontRightMotor.setVoltageRampRate(driveramp);
+		// rearLeftMotor.setVoltageRampRate(driveramp);
+		// rearRightMotor.setVoltageRampRate(driveramp);
 
-//add ref to list
-
+		// add ref to list
 
 	}
 
-	// 
+	//
 	public void autonomousInit() {
-		for (int i = 0; i < sharedStuff.cmdlist.size(); i++) {
-			sharedStuff.cmdlist.get(i).autonomousInit();
+		// Output RangeFinder Distance
+		// rangeFinder.setDistance();
+		t1.stop();
+		t1.reset();
+		t1.start();
+		for (int i = 0; i < SharedStuff.cmdlist.size(); i++) {
+			SharedStuff.cmdlist.get(i).autonomousInit();
 		}
 
 	}
@@ -127,33 +109,85 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during autonomous
 	 */
 	public void autonomousPeriodic() {
-		for (int i = 0; i < sharedStuff.cmdlist.size(); i++) {
-			sharedStuff.cmdlist.get(i).autonomousPeriodic();
+		// Output RangeFinder Distance
+		// rangeFinder.setDistance()
+		for (int i = 0; i < SharedStuff.cmdlist.size(); i++) {
+			SharedStuff.cmdlist.get(i).autonomousPeriodic();
 		}
 
 	}
 
-	public void DisabledPeriodic() {
-		
-		//  In disabled, all speeds should be set to 0
-		elevator.set(0);
-		shootMotor1.set(0);
-		shootMotor2.set(0);
+	public void teleopInit() {
+		t1.start();
+		state = 0;
 	}
 
 	/**
 	 * This function is called periodically during operator control
 	 */
+
 	public void teleopPeriodic() {
-		for (int i = 0; i < sharedStuff.cmdlist.size(); i++) {
-			sharedStuff.cmdlist.get(i).teleopPeriodic();
+		//gyrotest should display stuff at th display in string 2 on down
+		Double angle = gyro.getAngle();
+		Double xVal = b_acc.getX(); 
+		Double yVal = b_acc.getY(); 
+		Double zVal = b_acc.getZ(); 
+		Double accel = acc.getAcceleration();
+		SharedStuff.msg[2] = " Gyro Angle " + angle.toString();
+		SharedStuff.msg[3] = " Acceleratio  " + accel.toString();
+		SharedStuff.msg[7] = " Acceleratio  " + xVal.toString();
+		SharedStuff.msg[8] = " Acceleratio  " + yVal.toString();
+		SharedStuff.msg[9] = " Acceleratio  " + zVal.toString();
+		// Output RangeFinder Distance
+		// rangeFinder.setDistance();
+		if (driveStick.getRawButton(7)) {
+			state = 1;
+		}
+		if (state > 0) {
+			if (state == 1) {
+				state = 2;
+				armMotor1.set(-.8);
+				armMotor1.set(-.8);
+				t1.reset();
+				t1.stop();
+				t1.start();
+				driveStick.pY = 0;
+				aDrive.autonomousPeriodic();
+			} else if (state == 2) {
+				armMotor1.set(-.5);
+				armMotor2.set(-.5);
+				aDrive.autonomousPeriodic();
+				if (t1.get() > .5) {
+					driveStick.pY = .65;
+					state = 3;
+				}
+			} else if (state == 3) {
+				armMotor1.set(-.5);
+				armMotor2.set(-.5);
+				aDrive.autonomousPeriodic();
+				if (t1.get() > 3) {
+					t1.reset();
+					t1.stop();
+					driveStick.pY = 0;
+					armMotor1.set(0);
+					armMotor1.set(0);
+					state = 0;
+
+				}
+
+			}
+		} else {
+			for (int i = 0; i < SharedStuff.cmdlist.size(); i++) {
+				SharedStuff.cmdlist.get(i).teleopPeriodic();
+			}
 		}
 	}
 
-	public void testInit()
-
-	{
+	public void testInit() {
+		// Output RangeFinder Distance
+		// rangeFinder.setDistance();
 		t1.start();
+		state = 0;
 	}
 
 	/**
@@ -161,52 +195,92 @@ public class Robot extends IterativeRobot {
 	 * 
 	 */
 	public void testPeriodic() {
-	 aDrive.testPeriodic();
-wmsg.testPeriodic();
-		// Servo Logic
-		if (driveStick.getRawButton(5) == true) {
-			s1.set(0);
-		} else if (driveStick.getRawButton(6) == true) {
-			s1.set(1);
-		}
-		
-		// Shooting Logic
-		if (driveStick.getRawButton(2) == true) {
-			
-			// Motors for pickup
-			shootMotor1.set(-.35);
-			shootMotor2.set(.35);
-		} else if (driveStick.getRawButton(1)) {
-			
-			// Motors for shoot
-			shootMotor1.set(1);
-			shootMotor2.set(-1);
-		} else {
-			shootMotor1.set(0);
-			shootMotor2.set(0);
-		}
+		// Output RangeFinder Distance
+		// rangeFinder.setDistance();
 
-		// Elevator Logic
-		if (driveStick.getRawButton(3) == true) {
-			elevator.set(.2);
-		} else if (driveStick.getRawButton(4)) {
-			elevator.set(-.2);
-		} else {
-			elevator.set(-.05);
+		if (driveStick.getRawButton(7)) {
+			state = 1;
 		}
+		if (state > 0) {
+			if (state == 1) {
+				state = 2;
+				armMotor1.set(-.8);
+				armMotor1.set(-.8);
+				t1.reset();
+				t1.stop();
+				t1.start();
+				driveStick.pY = 0;
+				aDrive.autonomousPeriodic();
+			} else if (state == 2) {
+				armMotor1.set(-.5);
+				armMotor2.set(-.5);
+				aDrive.autonomousPeriodic();
+				if (t1.get() > .5) {
+					driveStick.pY = .65;
+					state = 3;
+				}
+			} else if (state == 3) {
+				armMotor1.set(-.5);
+				armMotor2.set(-.5);
+				aDrive.autonomousPeriodic();
+				if (t1.get() > 3) {
+					t1.reset();
+					t1.stop();
+					driveStick.pY = 0;
+					armMotor1.set(0);
+					armMotor1.set(0);
+					state = 0;
 
+				}
+
+			}
+		} else {
+			aDrive.testPeriodic();
+			// wmsg.testPeriodic();
+			// Servo Logic
+			if (driveStick.getRawButton(5) == true) {
+				s1.set(0);
+			} else if (driveStick.getRawButton(6) == true) {
+				s1.set(1);
+			}
+
+			// Shooting Logic
+			if (driveStick.getRawButton(2) == true) {
+
+				// Motors for pickup
+				shootMotor1.set(-.35);
+				shootMotor2.set(.35);
+			} else if (driveStick.getRawButton(1)) {
+
+				// Motors for shoot
+				shootMotor1.set(1);
+				shootMotor2.set(-1);
+			} else {
+				shootMotor1.set(0);
+				shootMotor2.set(0);
+			}
+
+			// Elevator Logic
+			if (driveStick.getRawButton(3) == true) {
+				elevator.set(.2);
+			} else if (driveStick.getRawButton(4)) {
+				elevator.set(-.2);
+			} else {
+				elevator.set(-.05);
+			}
+		}
 		// Debug Output
-			sharedStuff.msg[0] =" Left I " + frontLeftMotor.getOutputCurrent();
-			sharedStuff.msg[5] = "right I " + frontRightMotor.getOutputCurrent();
-			sharedStuff.msg[1] =" Left O " + frontLeftMotor.getOutputVoltage();
-			sharedStuff.msg[6] = "right O " + frontRightMotor.getOutputVoltage();
-			sharedStuff.msg[2] = " Left V " + frontLeftMotor.getBusVoltage();
-			sharedStuff.msg[7] = "right V " + frontRightMotor.getBusVoltage();
-			sharedStuff.msg[3] = " Enc pos " + elevator.getEncPosition();
-			sharedStuff.msg[8] = "getpos" + elevator.getPosition();
-			sharedStuff.msg[4] = " sh1 I " + shootMotor1.getOutputCurrent();
-			sharedStuff.msg[9] = "right S " + shootMotor2.getOutputCurrent();
-frontLeftMotor.g
+		SharedStuff.msg[0] = " Left I " + frontLeftMotor.getOutputCurrent();
+		SharedStuff.msg[5] = "right I " + frontRightMotor.getOutputCurrent();
+		SharedStuff.msg[1] = " Left O " + frontLeftMotor.getOutputVoltage();
+		SharedStuff.msg[6] = "right O " + frontRightMotor.getOutputVoltage();
+		SharedStuff.msg[2] = " Left V " + frontLeftMotor.getBusVoltage();
+		SharedStuff.msg[7] = "right V " + frontRightMotor.getBusVoltage();
+		SharedStuff.msg[3] = " Enc pos " + elevator.getEncPosition();
+		SharedStuff.msg[8] = "getpos" + elevator.getPosition();
+		SharedStuff.msg[4] = " sh1 I " + shootMotor1.getOutputCurrent();
+		SharedStuff.msg[9] = "right S " + shootMotor2.getOutputCurrent();
+
 	}
 
 }

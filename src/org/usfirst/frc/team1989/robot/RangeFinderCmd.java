@@ -1,12 +1,13 @@
+/*
+ * I do not know the significance of this yet.  I will talk to Martin Tonight
+ */
+
 package org.usfirst.frc.team1989.robot;
 	
-import java.util.ArrayList;
-
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class RangeFinderCmd extends AnalogInput implements cmd {
-	public ArrayList<cmd> list;
+public class RangeFinderCmd extends AnalogInput {
 	public String type = "RangeFinderCmd";
 	public int channel = -1;
 	public double distance = 0;
@@ -17,11 +18,9 @@ public class RangeFinderCmd extends AnalogInput implements cmd {
 		super(ch);
 		channel = ch;
 	    	sc = new Integer(channel).toString().trim();
-		// TODO Auto-generated constructor stub
 	}
 
-	@Override
-	public void disabledInit() {
+	/*public void disabledInit() {
 		// TODO Auto-generated method stub
 		setDistance();
 	}
@@ -35,35 +34,34 @@ public class RangeFinderCmd extends AnalogInput implements cmd {
 		setDistance();
 	}
 
-	@Override
+	
 	public void autonomousInit() {
 		// TODO Auto-generated method stub
 		setDistance();
 	}
 
-	@Override
+	
 	public void autonomousPeriodic() {
 		// TODO Auto-generated method stub
 		setDistance();
 	}
 
-	@Override
-	public void DisabledPeriodic() {
+	
+	public void disabledPeriodic() {
 		// TODO Auto-generated method stub
 		setDistance();
 	}
 
-	@Override
+
 	public void teleopPeriodic() {
 		// TODO Auto-generated method stub
 		setDistance();
 	}
 
-	@Override
 	public void testPeriodic() {
 		// TODO Auto-generated method stub
 		setDistance();
-	}
+	}*/
 
 	public void setDistance() {
 		distance = Math.floor(getVoltage() *102.4);

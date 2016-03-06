@@ -43,7 +43,7 @@ public class JsScaled extends Joystick {
     }
 
     public double sgetTwist() {
-	return scale(super.getTwist());
+	return scale(scale(super.getTwist()));
     }
 
     public double getThrottle() {
