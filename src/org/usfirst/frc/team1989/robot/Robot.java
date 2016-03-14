@@ -6,6 +6,7 @@ package org.usfirst.frc.team1989.robot;
 import edu.wpi.first.wpilibj.AnalogAccelerometer;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -38,7 +39,7 @@ public class Robot extends a_cmd {
 	
 	
 	JsScaled driveStick = new JsScaled(0);
-	JsScaled uStick = new JsScaled(1);//The uStick will stand for the utility joystick responsible for shooting and arm movement
+//	JsScaled uStick = new JsScaled(1);//The uStick will stand for the utility joystick responsible for shooting and arm movement
 	
 	//Instantiating writmessage
 	writemessage wmsg = new writemessage();
@@ -55,11 +56,13 @@ public class Robot extends a_cmd {
 	ShooterCmd shooter = new ShooterCmd(driveStick, s1);
 	ArmsCmd arms = new ArmsCmd(driveStick);
 	
-	ShooterCmd shooter2 = new ShooterCmd(uStick, s1);
-	ArmsCmd arms2 = new ArmsCmd(uStick);
+	ShooterCmd shooter2 = new ShooterCmd(driveStick, s1);
+	ArmsCmd arms2 = new ArmsCmd(driveStick);
 
 	public void robotInit() {
-
+		CameraServer server = CameraServer.getInstance();
+		server.setQuality(50);
+		server.startAutomaticCapture("cam1");
 		System.out.println("i'm Alive");
 		gyro = new AnalogGyro(1);
 		acc = new AnalogAccelerometer(0);
@@ -128,16 +131,25 @@ public class Robot extends a_cmd {
 
 	public void teleopPeriodic() {
 		//gyrotest should display stuff at th display in string 2 on down
-		Double angle = gyro.getAngle();
+		
+////		double distance = rf1.getVoltage() *102.4;
+	//	SharedStuff.msg[1] = "Rangefinder: " + new Integer((int) distance).toString();
+
 		Double xVal = b_acc.getX(); 
 		Double yVal = b_acc.getY(); 
 		Double zVal = b_acc.getZ(); 
-		Double accel = acc.getAcceleration();
-		SharedStuff.msg[2] = " Gyro Angle " + angle.toString();
-		SharedStuff.msg[3] = " Acceleratio  " + accel.toString();
-		SharedStuff.msg[7] = " Acceleratio  " + xVal.toString();
-		SharedStuff.msg[8] = " Acceleratio  " + yVal.toString();
-		SharedStuff.msg[9] = " Acceleratio  " + zVal.toString();
+		SharedStuff.msg[7] = " x  " + xVal.toString();
+		SharedStuff.msg[8] = " y  " + yVal.toString();
+		SharedStuff.msg[9] = " z  " + zVal.toString();
+		
+		if (t1.get() > .25)
+		{
+			t1.reset();
+			System.out.println(" x  " + xVal.toString());
+			System.out.println(" y  " + yVal.toString());
+			System.out.println(" z  " + zVal.toString()) ;
+			
+		}
 		// Output RangeFinder Distance
 		// rangeFinder.setDistance();
 		if (driveStick.getRawButton(7)) {

@@ -32,8 +32,8 @@ public class ShooterCmd extends a_cmd {
 	
 	public void shootMotorOperation(){
 		//so the shooter needs a timer and a state and some logic depending on state
-		SharedStuff.msg[0] =" Left s I " + shootMotor1.getOutputCurrent();
-		SharedStuff.msg[5] = "lasti " + lasti;
+//		SharedStuff.msg[0] =" Left s I " + shootMotor1.getOutputCurrent();
+//		SharedStuff.msg[5] = "lasti " + lasti;
 
 		if(driveStick.getRawButton(5) == true){
 			SharedStuff.led[1] = false;
