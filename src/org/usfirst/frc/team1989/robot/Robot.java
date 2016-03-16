@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -63,7 +64,7 @@ public class Robot extends a_cmd {
 		server.setQuality(50);
 		server.startAutomaticCapture("cam1");
 		System.out.println("i'm Alive");
-		gyro = new ADXRS450_Gyro();
+		gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);  // try 1,2,3 to find the Gyro
 		rf1 = new AnalogInput(3);
 		b_acc = new BuiltInAccelerometer();
 		// Construct CMD List
@@ -135,18 +136,18 @@ public class Robot extends a_cmd {
 	SharedStuff.msg[1] = "RF: " + new Integer((int) distance).toString();
 		if (t1.get() > .25)
 		{
-	//	Double angle = gyro.getAngle();
+		Double angle = gyro.getAngle();
 		Double xVal = b_acc.getX(); 
 		Double yVal = b_acc.getY(); 
 		Double zVal = b_acc.getZ(); 
-//		Integer ia = new Integer(angle.intValue()* 100);
+		Integer ia = new Integer(angle.intValue()* 100);
 		SharedStuff.msg[7] = " x  " + xVal.toString();
-//		SharedStuff.msg[6] = " angle  " +  angle.toString();
+		SharedStuff.msg[6] = " angle  " +  angle.toString();
 		SharedStuff.msg[8] = " y  " + yVal.toString();
 		SharedStuff.msg[9] = " z  " + zVal.toString();
 		
 			t1.reset();
-	//		System.out.print(" angle  " + angle.toString());
+			System.out.print(" angle  " + angle.toString());
 			System.out.print(" x  " + xVal.toString());
 			System.out.print(" y  " + yVal.toString());
 			System.out.println(" z  " + zVal.toString()) ;
