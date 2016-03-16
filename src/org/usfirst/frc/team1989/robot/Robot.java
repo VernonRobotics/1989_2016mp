@@ -3,13 +3,12 @@
 
 package org.usfirst.frc.team1989.robot;
 
-import edu.wpi.first.wpilibj.AnalogAccelerometer;
-import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -26,7 +25,7 @@ public class Robot extends a_cmd {
 	 * used for any initialization code.
 	 */
 	int state = 0;
-
+	AnalogInput rf1;
 	double driveramp = 6.0;
 
 	// Instantiating Timer
@@ -64,8 +63,8 @@ public class Robot extends a_cmd {
 		server.setQuality(50);
 		server.startAutomaticCapture("cam1");
 		System.out.println("i'm Alive");
-		gyro = new AnalogGyro(1);
-		acc = new AnalogAccelerometer(0);
+		gyro = new ADXRS450_Gyro();
+		rf1 = new AnalogInput(3);
 		b_acc = new BuiltInAccelerometer();
 		// Construct CMD List
 		SharedStuff.cmdlist.add(aDrive);
@@ -132,21 +131,24 @@ public class Robot extends a_cmd {
 	public void teleopPeriodic() {
 		//gyrotest should display stuff at th display in string 2 on down
 		
-////		double distance = rf1.getVoltage() *102.4;
-	//	SharedStuff.msg[1] = "Rangefinder: " + new Integer((int) distance).toString();
-
+		double distance = rf1.getVoltage() *102.4;
+	SharedStuff.msg[1] = "RF: " + new Integer((int) distance).toString();
+		if (t1.get() > .25)
+		{
+	//	Double angle = gyro.getAngle();
 		Double xVal = b_acc.getX(); 
 		Double yVal = b_acc.getY(); 
 		Double zVal = b_acc.getZ(); 
+//		Integer ia = new Integer(angle.intValue()* 100);
 		SharedStuff.msg[7] = " x  " + xVal.toString();
+//		SharedStuff.msg[6] = " angle  " +  angle.toString();
 		SharedStuff.msg[8] = " y  " + yVal.toString();
 		SharedStuff.msg[9] = " z  " + zVal.toString();
 		
-		if (t1.get() > .25)
-		{
 			t1.reset();
-			System.out.println(" x  " + xVal.toString());
-			System.out.println(" y  " + yVal.toString());
+	//		System.out.print(" angle  " + angle.toString());
+			System.out.print(" x  " + xVal.toString());
+			System.out.print(" y  " + yVal.toString());
 			System.out.println(" z  " + zVal.toString()) ;
 			
 		}

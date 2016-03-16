@@ -1,12 +1,9 @@
 package org.usfirst.frc.team1989.robot;
 
-import edu.wpi.first.wpilibj.AnalogAccelerometer;
-import edu.wpi.first.wpilibj.AnalogGyro;
-import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public abstract class a_cmd extends IterativeRobot implements cmd {
 	
@@ -24,9 +21,8 @@ public abstract class a_cmd extends IterativeRobot implements cmd {
 	CANTalon armMotor1 = new CANTalon(1);
 	CANTalon armMotor2 = new CANTalon(4);
 	CANTalon elevator = new CANTalon(5);
-	AnalogGyro gyro;
-	AnalogAccelerometer acc;
-//		AnalogInput rf1 = new AnalogInput(0);
+	ADXRS450_Gyro gyro;
+//	AnalogInput rf1 = new AnalogInput(0);
 	Accelerometer b_acc;
 	
 	// Needs to be updated when hooked up.
