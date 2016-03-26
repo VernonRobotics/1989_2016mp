@@ -8,7 +8,7 @@ public class JsScaled extends Joystick {
     public double pY = 0; 
     public double pX = 0;
     public double pTwist = 0;
-    public boolean[] buttons;
+    public boolean[] buttons = new boolean[15];
     
     public JsScaled(int port, double low, double deadzone) {
 	this(port);

@@ -6,23 +6,23 @@ import edu.wpi.first.wpilibj.Servo;
 
 public class ShooterCmd extends a_cmd {
 	
-	JsScaled driveStick;
+	JsScaled stick;
 	Servo s1;
 	Timer t1 = new Timer();
 	int lastaction = 0; //0 off, 1 pickup 2 spinup
 	double lasti =0.000; //last current	
 	double nexttimer = 0.000;
 	
-	public ShooterCmd (JsScaled driveStick, Servo s1){
-		this.driveStick = driveStick;
+	public ShooterCmd (JsScaled stick, Servo s1){
+		this.stick = stick;
 		this.s1 = s1;
 		
 	}
 	
 	public void elevatorOperation(){
-		if(driveStick.getPOV(0) == 180){
+		if(stick.getPOV(0) == 180 || uStick.getPOV(0) == 180){
 			elevator.set(.4);
-		}else if(driveStick.getPOV(0) == 0){
+		}else if(stick.getPOV(0) == 0 || uStick.getPOV(0) ==0){
 			elevator.set(-.4);
 		}else{
 			elevator.set(-.04);
@@ -35,7 +35,7 @@ public class ShooterCmd extends a_cmd {
 //		SharedStuff.msg[0] =" Left s I " + shootMotor1.getOutputCurrent();
 //		SharedStuff.msg[5] = "lasti " + lasti;
 
-		if(driveStick.getRawButton(5) == true){
+		if(stick.getRawButton(5) == true){
 			SharedStuff.led[1] = false;
 			this.lastaction = 1;
 			shootMotor1.set(-.35);
@@ -43,12 +43,12 @@ public class ShooterCmd extends a_cmd {
 			elevator.set(.5);
 			SharedStuff.led[0] = false;
 			lastaction = 0;
-			if (shootMotor1.isFwdLimitSwitchClosed())
+			if (shootMotor1.isFwdLimitSwitchClosed() ||shootMotor1.isRevLimitSwitchClosed())
 			{
 				SharedStuff.led[1] = true;
 			}
 			}
-		else if (driveStick.getRawButton(3)){
+		else if (stick.getRawButton(3)){
 			SharedStuff.led[1] = false;
 			if(lastaction != 2){
 				t1.stop();
@@ -75,14 +75,14 @@ public class ShooterCmd extends a_cmd {
 			shootMotor1.set(0);
 			shootMotor2.set(0);
 			this.lastaction = 0;
-			SharedStuff.led[1] = false;
+//			SharedStuff.led[1] = false;
 		}
 		
 	}
 	
 	public void servoOperation(){
 		
-		if(driveStick.getRawButton(1) == true){
+		if(stick.getRawButton(1) == true){
 			s1.set(1);
 			t1.start();
 			

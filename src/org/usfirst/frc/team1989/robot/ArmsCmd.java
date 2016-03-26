@@ -37,7 +37,22 @@ public class ArmsCmd extends a_cmd{
 
 	public void disabledInit() {}
 	public void autonomousInit() {}
-	public void autonomousPeriodic() {}
+	public void autonomousPeriodic() {
+		if (driveStick.buttons[6] == true){
+			armMotor1.set(-0.5);
+			armMotor2.set(-0.5);
+		}
+		
+		else if (driveStick.buttons[4] == true){
+			armMotor1.set(0.5);
+			armMotor2.set(0.5);
+		}
+		else{
+			armMotor1.set(-0.05);
+			armMotor2.set(-0.05);
+		}
+		
+	}
 	public void DisabledPeriodic() {}
 	public void testInit() {}
 	public void teleopInit() {}

@@ -12,18 +12,22 @@ public abstract class a_cmd extends IterativeRobot implements cmd {
 	public static double Kp = 0.03; // const for multiplying gyro angle 
 	
 	// Instantiating TalonSRX Motors
-	CANTalon frontLeftMotor = new CANTalon(3);
-	CANTalon frontRightMotor = new CANTalon(9);
-	CANTalon rearLeftMotor = new CANTalon(6);
-	CANTalon rearRightMotor = new CANTalon(7);
-	CANTalon shootMotor1 = new CANTalon(2);
-	CANTalon shootMotor2 = new CANTalon(8);
-	CANTalon armMotor1 = new CANTalon(1);
-	CANTalon armMotor2 = new CANTalon(4);
-	CANTalon elevator = new CANTalon(5);
+	CANTalon1989 frontLeftMotor = new CANTalon1989(3);
+	CANTalon1989 frontRightMotor = new CANTalon1989(9);
+	CANTalon1989 rearLeftMotor = new CANTalon1989(6);
+	CANTalon1989 rearRightMotor = new CANTalon1989(7);
+	CANTalon1989 shootMotor1 = new CANTalon1989(2);
+	CANTalon1989 shootMotor2 = new CANTalon1989(8);
+	CANTalon1989 armMotor1 = new CANTalon1989(1);
+	CANTalon1989 armMotor2 = new CANTalon1989(4);
+	CANTalon1989 elevator = new CANTalon1989(5);
 	ADXRS450_Gyro gyro;
 //	AnalogInput rf1 = new AnalogInput(0);
 	Accelerometer b_acc;
+	JsScaled driveStick = new JsScaled(0);
+	JsScaled uStick = new JsScaled(1);//The uStick will stand for the utility joystick responsible for shooting and arm movement
+	int autoStatus = 0;
+	int autoMode = 0;
 	
 	// Needs to be updated when hooked up.
 //	public RangeFinderCmd rangeFinder = new RangeFinderCmd(0);

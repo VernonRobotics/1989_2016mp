@@ -44,6 +44,8 @@ public class writemessage extends a_cmd {
 	public void updatedash() {
 		String curr ;
 		String last;
+		boolean lastled;
+		boolean currled;
 		if (t1.get() > .25) {
 			t1.reset();
 			t1.start();
@@ -57,9 +59,11 @@ public class writemessage extends a_cmd {
 					SharedStuff.lastmsg[i]= curr;
 				}
 				if (i < 5) {
-					if (SharedStuff.led[i].booleanValue() !=SharedStuff.lastled[i].booleanValue()) {
-						SmartDashboard.putBoolean("DB/LED " + i, SharedStuff.led[i].booleanValue());
-						SharedStuff.lastled[i] = SharedStuff.led[i].booleanValue();
+					lastled = SharedStuff.lastled[i].booleanValue();
+					currled = SharedStuff.led[i].booleanValue();
+					if (currled != lastled) {
+						SmartDashboard.putBoolean("DB/LED " + i, currled);
+						SharedStuff.lastled[i] = currled;
 					}
 				}
 			}

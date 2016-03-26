@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -36,12 +37,8 @@ public class Robot extends a_cmd {
 	Servo s1 = new Servo(0);
 
 	// Instantiating Joysticks
-	
-	
-	JsScaled driveStick = new JsScaled(0);
-//	JsScaled uStick = new JsScaled(1);//The uStick will stand for the utility joystick responsible for shooting and arm movement
-	
-	//Instantiating writmessage
+
+	// Instantiating writmessage
 	writemessage wmsg = new writemessage();
 
 	// ArcadeDriveCMD Constructor - 4 motors
@@ -55,29 +52,30 @@ public class Robot extends a_cmd {
 
 	ShooterCmd shooter = new ShooterCmd(driveStick, s1);
 	ArmsCmd arms = new ArmsCmd(driveStick);
-	
-	ShooterCmd shooter2 = new ShooterCmd(driveStick, s1);
-	ArmsCmd arms2 = new ArmsCmd(driveStick);
+
+	// ShooterCmd shooter2 = new ShooterCmd(driveStick, s1);
+	// ArmsCmd arms2 = new ArmsCmd(driveStick);
 
 	public void robotInit() {
 		CameraServer server = CameraServer.getInstance();
 		server.setQuality(50);
 		server.startAutomaticCapture("cam1");
 		System.out.println("i'm Alive");
-		gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);  // try 1,2,3 to find the Gyro
+		// gyro = new adxrsmp(SPI.Port.kOnboardCS0); // try 1,2,3 to find the
+		// Gyro
 		rf1 = new AnalogInput(3);
 		b_acc = new BuiltInAccelerometer();
 		// Construct CMD List
 		SharedStuff.cmdlist.add(aDrive);
 		SharedStuff.cmdlist.add(shooter);
 		SharedStuff.cmdlist.add(arms);
-		SharedStuff.cmdlist.add(shooter2);
-		SharedStuff.cmdlist.add(arms2);
+		// SharedStuff.cmdlist.add(shooter2);
+		// SharedStuff.cmdlist.add(arms2);
 		SharedStuff.cmdlist.add(wmsg);
 		// SharedStuff.cmdlist.add(wmsg); // sb added last so that other objects
 		// can update first
 
-		// Limit Switches- In for now, will be changed to CAN network 
+		// Limit Switches- In for now, will be changed to CAN network
 		frontLeftMotor.enableLimitSwitch(false, false);
 		frontRightMotor.enableLimitSwitch(false, false);
 		rearLeftMotor.enableLimitSwitch(false, false);
@@ -99,6 +97,16 @@ public class Robot extends a_cmd {
 	public void autonomousInit() {
 		// Output RangeFinder Distance
 		// rangeFinder.setDistance();
+		frontLeftMotor.maxI = 1.5;
+		frontRightMotor.maxI = 1.5;
+		rearLeftMotor.maxI = 1.5;
+		rearRightMotor.maxI = 1.5;
+		autoStatus = 0;
+		autoMode = (SmartDashboard.getBoolean("DB/Button 0") ? 1 : 0)
+				+ (SmartDashboard.getBoolean("DB/Button 1") ? 2 : 0)
+				+ (SmartDashboard.getBoolean("DB/Button 2") ? 4 : 0)
+				+ (SmartDashboard.getBoolean("DB/Button 2") ? 8 : 0);
+		SharedStuff.msg[0] = "Automode " + autoMode;
 		t1.stop();
 		t1.reset();
 		t1.start();
@@ -114,15 +122,47 @@ public class Robot extends a_cmd {
 	public void autonomousPeriodic() {
 		// Output RangeFinder Distance
 		// rangeFinder.setDistance()
+		if (autoMode == 1) {
+			autoMode1(false);
+		}
+		else if(autoMode == 2) {
+			autoMode1(false);
+		} 
 		for (int i = 0; i < SharedStuff.cmdlist.size(); i++) {
 			SharedStuff.cmdlist.get(i).autonomousPeriodic();
 		}
 
 	}
 
+	public void autoMode1(boolean armup) {
+		driveStick.buttons[6] = armup;
+		driveStick.buttons[4] = !armup;
+
+		if (autoStatus == 0) {
+			autoStatus = 1;
+			driveStick.pY = .6;
+			t1.stop();
+			t1.reset();
+			t1.start();
+		} else if (autoStatus == 1) {
+			driveStick.pY = .6;
+			if (t1.get() > 5) {
+				autoStatus = 2;
+			}
+
+		} else if (autoStatus == 2) {
+			autoStatus = 3;
+			driveStick.pY = 0;
+		}
+	}
+
 	public void teleopInit() {
 		t1.start();
 		state = 0;
+		frontLeftMotor.maxI = 0;
+		frontRightMotor.maxI = 0;
+		rearLeftMotor.maxI = 0;
+		rearRightMotor.maxI = 0;
 	}
 
 	/**
@@ -130,28 +170,28 @@ public class Robot extends a_cmd {
 	 */
 
 	public void teleopPeriodic() {
-		//gyrotest should display stuff at th display in string 2 on down
-		
-		double distance = rf1.getVoltage() *102.4;
-	SharedStuff.msg[1] = "RF: " + new Integer((int) distance).toString();
-		if (t1.get() > .25)
-		{
-		Double angle = gyro.getAngle();
-		Double xVal = b_acc.getX(); 
-		Double yVal = b_acc.getY(); 
-		Double zVal = b_acc.getZ(); 
-		Integer ia = new Integer(angle.intValue()* 100);
-		SharedStuff.msg[7] = " x  " + xVal.toString();
-		SharedStuff.msg[6] = " angle  " +  angle.toString();
-		SharedStuff.msg[8] = " y  " + yVal.toString();
-		SharedStuff.msg[9] = " z  " + zVal.toString();
-		
+		// gyrotest should display stuff at th display in string 2 on down
+
+		double distance = rf1.getVoltage() * 102.4;
+		if (t1.get() > .25) {
+			// Double angle = gyro.getAngle();
+			Double xVal = b_acc.getX();
+			Double yVal = b_acc.getY();
+			Double zVal = b_acc.getZ();
+			SharedStuff.msg[1] = "RF: " + new Integer((int) distance).toString();
+			SharedStuff.msg[3] = " Enc pos " + elevator.getEncPosition();
+			// Integer ia = new Integer(angle.intValue()* 100);
+			SharedStuff.msg[7] = " x  " + xVal.toString();//
+			// SharedStuff.msg[6] = " angle " + angle.toString();
+			SharedStuff.msg[8] = " y  " + yVal.toString();
+			SharedStuff.msg[9] = " z  " + zVal.toString();
+
 			t1.reset();
-			System.out.print(" angle  " + angle.toString());
-			System.out.print(" x  " + xVal.toString());
-			System.out.print(" y  " + yVal.toString());
-			System.out.println(" z  " + zVal.toString()) ;
-			
+			// System.out.print(" angle " + angle.toString());
+			// System.out.print(" x " + xVal.toString());
+			// System.out.print(" y " + yVal.toString());
+			// System.out.println(" z " + zVal.toString()) ;
+
 		}
 		// Output RangeFinder Distance
 		// rangeFinder.setDistance();
@@ -285,6 +325,7 @@ public class Robot extends a_cmd {
 			}
 		}
 		// Debug Output
+		SharedStuff.led[2] = true;
 		SharedStuff.msg[0] = " Left I " + frontLeftMotor.getOutputCurrent();
 		SharedStuff.msg[5] = "right I " + frontRightMotor.getOutputCurrent();
 		SharedStuff.msg[1] = " Left O " + frontLeftMotor.getOutputVoltage();
@@ -295,7 +336,7 @@ public class Robot extends a_cmd {
 		SharedStuff.msg[8] = "getpos" + elevator.getPosition();
 		SharedStuff.msg[4] = " sh1 I " + shootMotor1.getOutputCurrent();
 		SharedStuff.msg[9] = "right S " + shootMotor2.getOutputCurrent();
-
+		wmsg.testPeriodic();
 	}
 
 }
