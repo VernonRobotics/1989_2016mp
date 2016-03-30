@@ -97,10 +97,14 @@ public class Robot extends a_cmd {
 	public void autonomousInit() {
 		// Output RangeFinder Distance
 		// rangeFinder.setDistance();
-		frontLeftMotor.maxI = 1.5;
-		frontRightMotor.maxI = 1.5;
-		rearLeftMotor.maxI = 1.5;
-		rearRightMotor.maxI = 1.5;
+		frontLeftMotor.maxI = 0;
+		frontRightMotor.maxI = 0;
+		rearLeftMotor.maxI = 0;
+		rearRightMotor.maxI = 0;
+		frontLeftMotor.overcurrent = 0;
+		frontRightMotor.overcurrent = 0;
+		rearLeftMotor.overcurrent = 0;
+		rearRightMotor.overcurrent = 0;
 		autoStatus = 0;
 		autoMode = (SmartDashboard.getBoolean("DB/Button 0") ? 1 : 0)
 				+ (SmartDashboard.getBoolean("DB/Button 1") ? 2 : 0)
@@ -122,11 +126,16 @@ public class Robot extends a_cmd {
 	public void autonomousPeriodic() {
 		// Output RangeFinder Distance
 		// rangeFinder.setDistance()
+		SharedStuff.msg[2] ="c " + frontRightMotor.overcurrent + " " + frontRightMotor.factor;
+
 		if (autoMode == 1) {
 			autoMode1(false);
 		}
 		else if(autoMode == 2) {
-			autoMode1(false);
+			autoMode1(true);
+		} 
+		else if(autoMode == 4) {
+			autoMode4(false);
 		} 
 		for (int i = 0; i < SharedStuff.cmdlist.size(); i++) {
 			SharedStuff.cmdlist.get(i).autonomousPeriodic();
@@ -134,23 +143,123 @@ public class Robot extends a_cmd {
 
 	}
 
+	/*
+	 * guilotine
+	 */
+	public void autoMode4(boolean armup) {
+		driveStick.buttons[6] = armup;
+		driveStick.buttons[4] = !armup;
+
+		if (autoStatus == 0) {
+			autoStatus = 1;
+			driveStick.pY = .65;
+			t1.stop();
+			t1.reset();
+			t1.start();
+		} else if (autoStatus == 1) {
+			driveStick.pY = .65;
+			if (t1.get() > 2) {
+				t1.stop();
+				t1.reset();
+				t1.start();
+				frontLeftMotor.maxI = 4;
+				frontRightMotor.maxI = 4;
+				rearLeftMotor.maxI = 4;
+				rearRightMotor.maxI = 4;
+				frontLeftMotor.overcurrent = 0;
+				frontRightMotor.overcurrent = 0;
+				rearLeftMotor.overcurrent = 0;
+				rearRightMotor.overcurrent = 0;
+				autoStatus = 2;
+			}
+		} else if (autoStatus == 2 ){
+			if (frontRightMotor.overcurrent > 10 || rearRightMotor.overcurrent > 10 ||frontLeftMotor.overcurrent > 10 || rearLeftMotor.overcurrent > 10)
+				{autoStatus = 3;}
+			
+			driveStick.pY = .65;
+			if (t1.get() >5) {
+				t1.stop();
+				t1.reset();
+				t1.start();
+				autoStatus = 3;
+			}
+
+
+		} else if (autoStatus == 3) {
+			autoStatus = 4;
+			driveStick.pY = 0;
+		}
+		else if (autoStatus == 4) {
+			autoStatus = 5;
+			armMotor1.set(-.8);
+			armMotor2.set(-.8);
+			t1.reset();
+			t1.stop();
+			t1.start();
+			driveStick.pY = 0;
+		} else if (autoStatus == 5) {
+			armMotor1.set(-.5);
+			armMotor2.set(-.5);
+			if (t1.get() > .5) {
+				driveStick.pY = .65;
+				autoStatus = 6;
+			}
+		} else if (autoStatus == 6) {
+			armMotor1.set(-.5);
+			armMotor2.set(-.5);
+			if (t1.get() > 3) {
+				t1.reset();
+				t1.stop();
+				driveStick.pY = 0;
+				armMotor1.set(0);
+				armMotor2.set(0);
+				autoStatus = 7;
+			}
+		}
+	}
+	/*
+	 * arms up or down go straight
+	 */
 	public void autoMode1(boolean armup) {
 		driveStick.buttons[6] = armup;
 		driveStick.buttons[4] = !armup;
 
 		if (autoStatus == 0) {
 			autoStatus = 1;
-			driveStick.pY = .6;
+			driveStick.pY = .65;
 			t1.stop();
 			t1.reset();
 			t1.start();
 		} else if (autoStatus == 1) {
-			driveStick.pY = .6;
-			if (t1.get() > 5) {
+			driveStick.pY = .65;
+			if (t1.get() > 2) {
+				t1.stop();
+				t1.reset();
+				t1.start();
+				frontLeftMotor.maxI = 4;
+				frontRightMotor.maxI = 4;
+				rearLeftMotor.maxI = 4;
+				rearRightMotor.maxI = 4;
+				frontLeftMotor.overcurrent = 0;
+				frontRightMotor.overcurrent = 0;
+				rearLeftMotor.overcurrent = 0;
+				rearRightMotor.overcurrent = 0;
 				autoStatus = 2;
 			}
+		} else if (autoStatus == 2 ){
+			if (frontRightMotor.overcurrent > 10 || rearRightMotor.overcurrent > 10 ||frontLeftMotor.overcurrent > 10 || rearLeftMotor.overcurrent > 10)
+				{autoStatus = 3;}
+			
+			driveStick.pY = .65;
+			if (t1.get() >5) {
+				t1.stop();
+				t1.reset();
+				t1.start();
+				autoStatus = 3;
+			}
 
-		} else if (autoStatus == 2) {
+
+		} else if (autoStatus == 3) {
 			autoStatus = 3;
 			driveStick.pY = 0;
 		}
@@ -187,11 +296,8 @@ public class Robot extends a_cmd {
 			SharedStuff.msg[9] = " z  " + zVal.toString();
 
 			t1.reset();
-			// System.out.print(" angle " + angle.toString());
-			// System.out.print(" x " + xVal.toString());
-			// System.out.print(" y " + yVal.toString());
-			// System.out.println(" z " + zVal.toString()) ;
-
+			System.out.println("LF" + frontLeftMotor.getOutputCurrent() + " LR "  + rearLeftMotor.getOutputCurrent() +
+					" RF " + frontRightMotor.getOutputCurrent() + " RR "  + rearRightMotor.getOutputCurrent());
 		}
 		// Output RangeFinder Distance
 		// rangeFinder.setDistance();
