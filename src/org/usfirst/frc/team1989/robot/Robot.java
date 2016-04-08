@@ -57,6 +57,9 @@ public class Robot extends a_cmd {
 	// ArmsCmd arms2 = new ArmsCmd(driveStick);
 
 	public void robotInit() {
+		
+		
+		
 		CameraServer server = CameraServer.getInstance();
 		server.setQuality(50);
 		server.startAutomaticCapture("cam1");
@@ -162,10 +165,10 @@ public class Robot extends a_cmd {
 				t1.stop();
 				t1.reset();
 				t1.start();
-				frontLeftMotor.maxI = 4;
-				frontRightMotor.maxI = 4;
-				rearLeftMotor.maxI = 4;
-				rearRightMotor.maxI = 4;
+				frontLeftMotor.maxI = 12;
+				frontRightMotor.maxI = 12;
+				rearLeftMotor.maxI = 12;
+				rearRightMotor.maxI = 12;
 				frontLeftMotor.overcurrent = 0;
 				frontRightMotor.overcurrent = 0;
 				rearLeftMotor.overcurrent = 0;
@@ -190,6 +193,7 @@ public class Robot extends a_cmd {
 			driveStick.pY = 0;
 		}
 		else if (autoStatus == 4) {
+			// Distance before obstacle 
 			autoStatus = 5;
 			armMotor1.set(-.8);
 			armMotor2.set(-.8);
@@ -207,7 +211,8 @@ public class Robot extends a_cmd {
 		} else if (autoStatus == 6) {
 			armMotor1.set(-.5);
 			armMotor2.set(-.5);
-			if (t1.get() > 3) {
+			// Change Distance after Goal
+			if (t1.get() > 2) {
 				t1.reset();
 				t1.stop();
 				driveStick.pY = 0;
@@ -221,25 +226,26 @@ public class Robot extends a_cmd {
 	 * arms up or down go straight
 	 */
 	public void autoMode1(boolean armup) {
+		// Either arms up or down
 		driveStick.buttons[6] = armup;
 		driveStick.buttons[4] = !armup;
 
 		if (autoStatus == 0) {
 			autoStatus = 1;
-			driveStick.pY = .65;
+			driveStick.pY = .75;
 			t1.stop();
 			t1.reset();
 			t1.start();
 		} else if (autoStatus == 1) {
-			driveStick.pY = .65;
+			driveStick.pY = .75;
 			if (t1.get() > 2) {
 				t1.stop();
 				t1.reset();
 				t1.start();
-				frontLeftMotor.maxI = 4;
-				frontRightMotor.maxI = 4;
-				rearLeftMotor.maxI = 4;
-				rearRightMotor.maxI = 4;
+				frontLeftMotor.maxI = 12;
+				frontRightMotor.maxI = 12;
+				rearLeftMotor.maxI = 12;
+				rearRightMotor.maxI = 12;
 				frontLeftMotor.overcurrent = 0;
 				frontRightMotor.overcurrent = 0;
 				rearLeftMotor.overcurrent = 0;
@@ -247,11 +253,12 @@ public class Robot extends a_cmd {
 				autoStatus = 2;
 			}
 		} else if (autoStatus == 2 ){
-			if (frontRightMotor.overcurrent > 10 || rearRightMotor.overcurrent > 10 ||frontLeftMotor.overcurrent > 10 || rearLeftMotor.overcurrent > 10)
+			if (frontRightMotor.overcurrent > 20 || rearRightMotor.overcurrent > 20 ||frontLeftMotor.overcurrent > 20 || rearLeftMotor.overcurrent > 20)
 				{autoStatus = 3;}
 			
-			driveStick.pY = .65;
-			if (t1.get() >5) {
+			driveStick.pY = .75;
+			// Total distance from start
+			if (t1.get() >2) {
 				t1.stop();
 				t1.reset();
 				t1.start();
@@ -287,6 +294,7 @@ public class Robot extends a_cmd {
 			Double xVal = b_acc.getX();
 			Double yVal = b_acc.getY();
 			Double zVal = b_acc.getZ();
+			
 			SharedStuff.msg[1] = "RF: " + new Integer((int) distance).toString();
 			SharedStuff.msg[3] = " Enc pos " + elevator.getEncPosition();
 			// Integer ia = new Integer(angle.intValue()* 100);

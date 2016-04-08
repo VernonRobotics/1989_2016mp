@@ -18,7 +18,7 @@ public class ArcadeDriveCmd extends a_cmd {
 	RobotDrive rd;
 
 	/*
-	 * Main controller for use.  Basasd on 4 motors anda  speed controller.
+	 * Main controller for use.  Based on 4 motors and a speed controller.
 	 */
 	public ArcadeDriveCmd(int frontLeftMotor, int rearLeftMotor, int frontRightMotor, int rearRightMotor, JsScaled driveStick) {
 		rd = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
@@ -57,7 +57,7 @@ public class ArcadeDriveCmd extends a_cmd {
 	@Override
 	public void autonomousPeriodic() {
 		
-		arcadeDrive(driveStick.pY, driveStick.pTwist + (driveStick.pTwist !=0 ? offset : 0));
+		arcadeDrive(driveStick.pY, driveStick.pTwist + offsetCalc());
 		// TODO Auto-generated method stub
 
 	}
@@ -75,10 +75,29 @@ public class ArcadeDriveCmd extends a_cmd {
 
 	}
 
+	public double offsetCalc(){
+		
+		//SharedStuff.msg[1] = "Y Value: " + driveStick.sgetY();
+		if(driveStick.sgetTwist() <= 0.25 || driveStick.sgetTwist() >= -0.25){
+			return 0.0;
+			
+		}else {
+			if(driveStick.sgetY() >= .15 || driveStick.sgetY() <= -.15){
+				return .8;
+			}
+			
+		}
+		return 0.0;
+	}
+	
 	@Override
 	public void teleopPeriodic() {
 		// TODO Auto-generated method stub
-		arcadeDrive(0 - driveStick.sgetY(), 0-driveStick.sgetTwist()*.75 + (driveStick.sgetTwist() !=0 ? offset : 0));
+		if(driveStick.getRawButton(12)) {
+			arcadeDrive(0 - driveStick.sgetY(), 0 - driveStick.sgetTwist()*.75 + offsetCalc());
+		} else {
+			arcadeDrive(0 - driveStick.sgetY(), 0-driveStick.sgetTwist()*.75 + offsetCalc());
+		}
 	}
 
 	@Override

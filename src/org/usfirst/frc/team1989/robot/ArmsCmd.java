@@ -39,13 +39,13 @@ public class ArmsCmd extends a_cmd{
 	public void autonomousInit() {}
 	public void autonomousPeriodic() {
 		if (driveStick.buttons[6] == true){
-			armMotor1.set(-0.5);
-			armMotor2.set(-0.5);
+			armMotor1.set(-0.85);
+			armMotor2.set(-0.85);
 		}
 		
 		else if (driveStick.buttons[4] == true){
-			armMotor1.set(0.5);
-			armMotor2.set(0.5);
+			armMotor1.set(0.85);
+			armMotor2.set(0.85);
 		}
 		else{
 			armMotor1.set(-0.05);
