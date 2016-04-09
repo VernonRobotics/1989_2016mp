@@ -10,6 +10,7 @@ public class CANTalon1989 extends CANTalon {
 	public double factor = 1.0;
 	private double dSpeed = 0;
 	public int overcurrent = 0;
+	public double lastcurrent = 0;
 	
 	public CANTalon1989(int deviceNumber, int controlPeriodMs, int enablePeriodMs) {
 		super(deviceNumber, controlPeriodMs, enablePeriodMs);
@@ -42,6 +43,7 @@ public class CANTalon1989 extends CANTalon {
 		if (this.maxI > 0 && t1.get()> lasttimer +.025)
 		{
 			double curr = this.getOutputCurrent();
+			this.lastcurrent = curr;
 			if (curr > this.maxI || factor<1) 
 			{
 				this.overcurrent++;
