@@ -2,10 +2,15 @@ package org.usfirst.frc.team1989.robot;
 
 // All Imports - Will remove unecessary later
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Servo;
 
-public class ShooterCmd extends a_cmd {
+public class ShooterCmd implements cmd {
 	
+	CANTalon shootMotor1 = new CANTalon(2);
+	CANTalon shootMotor2 = new CANTalon(8);
+	
+	CANTalon elevator = new CANTalon(5);
 	JsScaled stick;
 	Servo s1;
 	Timer t1 = new Timer();
@@ -16,13 +21,18 @@ public class ShooterCmd extends a_cmd {
 	public ShooterCmd (JsScaled stick, Servo s1){
 		this.stick = stick;
 		this.s1 = s1;
-		
+		shootMotor1.enableLimitSwitch(false, false);
+		shootMotor2.enableLimitSwitch(false, false);
 	}
 	
 	public void elevatorOperation(){
-		if(stick.getPOV(0) == 180 || uStick.getPOV(0) == 180){
+		
+		//Up ??
+		if(stick.getPOV(0) == 180){
 			elevator.set(.4);
-		}else if(stick.getPOV(0) == 0 || uStick.getPOV(0) ==0){
+		
+		// Down ??
+		}else if(stick.getPOV(0) == 0){
 			elevator.set(-.4);
 		}else{
 			elevator.set(-.04);

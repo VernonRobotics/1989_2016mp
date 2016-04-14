@@ -40,7 +40,7 @@ public class CANTalon1989 extends CANTalon {
 	{
 		this.dSpeed = speed;
 		
-		if (this.maxI > 0 && t1.get()> lasttimer +.025)
+		if (this.maxI > 0 && t1.get()> lasttimer +.05)
 		{
 			double curr = this.getOutputCurrent();
 			this.lastcurrent = curr;

@@ -3,13 +3,16 @@
 
 package org.usfirst.frc.team1989.robot;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+
+//import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.BuiltInAccelerometer;
+//import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.IterativeRobot;
+//import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
+//import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -20,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
-public class Robot extends a_cmd {
+public class Robot extends IterativeRobot implements cmd{
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -30,6 +33,24 @@ public class Robot extends a_cmd {
 	AnalogInput rf1;
 	double driveramp = 6.0;
 
+	// Not sure this is needed - will talk to Mr. Pirringer about it
+		public String type = ""; // holds class type
+		public static double Kp = 0.03; // const for multiplying gyro angle 
+		
+		// Instantiating TalonSRX Motors
+		CANTalon1989 frontLeftMotor = new CANTalon1989(3);
+		CANTalon1989 frontRightMotor = new CANTalon1989(9);
+		CANTalon1989 rearLeftMotor = new CANTalon1989(6);
+		CANTalon1989 rearRightMotor = new CANTalon1989(7);
+		
+// gyro;
+//		AnalogInput rf1 = new AnalogInput(0);
+//		Accelerometer b_acc;
+		JsScaled driveStick = new JsScaled(0);
+		JsScaled uStick = new JsScaled(1);//The uStick will stand for the utility joystick responsible for shooting and arm movement
+		int autoStatus = 0;
+		int autoMode = 0;
+	
 	// Instantiating Timer
 	Timer t1 = new Timer();
 
@@ -57,17 +78,15 @@ public class Robot extends a_cmd {
 	// ArmsCmd arms2 = new ArmsCmd(driveStick);
 
 	public void robotInit() {
-		
-		
-		
+
 		CameraServer server = CameraServer.getInstance();
 		server.setQuality(50);
 		server.startAutomaticCapture("cam1");
-		System.out.println("i'm Alive");
+		// System.out.println("i'm Alive");
 		// gyro = new adxrsmp(SPI.Port.kOnboardCS0); // try 1,2,3 to find the
 		// Gyro
-		rf1 = new AnalogInput(3);
-		b_acc = new BuiltInAccelerometer();
+		// rf1 = new AnalogInput(3);
+		// b_acc = new BuiltInAccelerometer();
 		// Construct CMD List
 		SharedStuff.cmdlist.add(aDrive);
 		SharedStuff.cmdlist.add(shooter);
@@ -79,12 +98,11 @@ public class Robot extends a_cmd {
 		// can update first
 
 		// Limit Switches- In for now, will be changed to CAN network
-		frontLeftMotor.enableLimitSwitch(false, false);
-		frontRightMotor.enableLimitSwitch(false, false);
-		rearLeftMotor.enableLimitSwitch(false, false);
-		rearRightMotor.enableLimitSwitch(false, false);
-		shootMotor1.enableLimitSwitch(false, false);
-		shootMotor2.enableLimitSwitch(false, false);
+		// frontLeftMotor.enableLimitSwitch(false, false);
+		// frontRightMotor.enableLimitSwitch(false, false);
+		// rearLeftMotor.enableLimitSwitch(false, false);
+		// rearRightMotor.enableLimitSwitch(false, false);
+		
 
 		// Voltage Ramps - none for now
 		// frontLeftMotor.setVoltageRampRate(driveramp);
@@ -96,6 +114,17 @@ public class Robot extends a_cmd {
 
 	}
 
+	public void disabledInit(){
+	}
+	
+    public void disabledPeriodic(){
+    	// Disable all motors
+    	frontLeftMotor.set(0);
+    	frontRightMotor.set(0);
+    	rearLeftMotor.set(0);
+    	rearRightMotor.set(0);
+    	
+    }
 	//
 	public void autonomousInit() {
 		// Output RangeFinder Distance
@@ -123,36 +152,38 @@ public class Robot extends a_cmd {
 
 	}
 
-	/**
-	 * This function is called periodically during autonomous
-	 */
 	public void autonomousPeriodic() {
 		// Output RangeFinder Distance
 		// rangeFinder.setDistance()
-		SharedStuff.msg[2] ="c " + frontRightMotor.overcurrent + " " + frontRightMotor.factor;
+		SharedStuff.msg[2] = "c " + frontRightMotor.overcurrent + " " + frontRightMotor.factor;
 
 		if (autoMode == 1) {
 			autoMode1(false);
-		}
-		else if(autoMode == 2) {
+		} else if (autoMode == 2) {
 			autoMode1(true);
-		} 
-		else if(autoMode == 4) {
-			autoMode4(false);
-		} 
-		else if(autoMode == 8) {
+		}
+
+		if (autoMode == 3) {
+			autoMode3(false);
+		}
+
+		else if (autoMode == 4) {
+			autoMode4(true);
+		} else if (autoMode == 8) {
 			autoMode8();
-		} 
+		}
 		for (int i = 0; i < SharedStuff.cmdlist.size(); i++) {
 			SharedStuff.cmdlist.get(i).autonomousPeriodic();
 		}
 
 	}
 
-	public void autoMode8() {
+	// Back and through Low Bar
+	public void autoMode3(boolean armup) {
 		// Either arms up or down
-		driveStick.buttons[6] = true;
-		driveStick.buttons[4] = false;
+
+		// driveStick.buttons[6] = armup;
+		driveStick.buttons[4] = !armup;
 
 		if (autoStatus == 0) {
 			autoStatus = 1;
@@ -163,6 +194,100 @@ public class Robot extends a_cmd {
 		} else if (autoStatus == 1) {
 			driveStick.pY = .75;
 			if (t1.get() > 2) {
+				t1.stop();
+				t1.reset();
+				t1.start();
+				frontLeftMotor.maxI = 12;
+				frontRightMotor.maxI = 12;
+				rearLeftMotor.maxI = 12;
+				rearRightMotor.maxI = 12;
+				frontLeftMotor.overcurrent = 0;
+				frontRightMotor.overcurrent = 0;
+				rearLeftMotor.overcurrent = 0;
+				rearRightMotor.overcurrent = 0;
+				autoStatus = 2;
+			}
+		} else if (autoStatus == 2) {
+			if (frontRightMotor.overcurrent > 20 || rearRightMotor.overcurrent > 20 || frontLeftMotor.overcurrent > 20
+					|| rearLeftMotor.overcurrent > 20) {
+				autoStatus = 3;
+			}
+
+			driveStick.pY = .75;
+			// Total distance from start
+			if (t1.get() > 2.5) {
+				t1.stop();
+				t1.reset();
+				t1.start();
+				autoStatus = 3;
+				frontLeftMotor.maxI = 12;
+				frontRightMotor.maxI = 12;
+				rearLeftMotor.maxI = 12;
+				rearRightMotor.maxI = 12;
+				frontLeftMotor.overcurrent = 0;
+				frontRightMotor.overcurrent = 0;
+				rearLeftMotor.overcurrent = 0;
+				rearRightMotor.overcurrent = 0;
+			}
+
+		} else if (autoStatus == 3) {
+			if (frontRightMotor.overcurrent > 20 || rearRightMotor.overcurrent > 20 || frontLeftMotor.overcurrent > 20
+					|| rearLeftMotor.overcurrent > 20) {
+				autoStatus = 4;
+			}
+
+			driveStick.pY = -.75;
+			// Total distance from start
+			if (t1.get() > 3.55) {
+				t1.stop();
+				t1.reset();
+				t1.start();
+				autoStatus = 4;
+				frontLeftMotor.maxI = 12;
+				frontRightMotor.maxI = 12;
+				rearLeftMotor.maxI = 12;
+				rearRightMotor.maxI = 12;
+				frontLeftMotor.overcurrent = 0;
+				frontRightMotor.overcurrent = 0;
+				rearLeftMotor.overcurrent = 0;
+				rearRightMotor.overcurrent = 0;
+			}
+
+		} else if (autoStatus == 4) {
+			if (frontRightMotor.overcurrent > 20 || rearRightMotor.overcurrent > 20 || frontLeftMotor.overcurrent > 20
+					|| rearLeftMotor.overcurrent > 20) {
+				autoStatus = 9;
+			}
+
+			driveStick.pY = 0;
+			// Total distance from start
+			if (t1.get() > 2) {
+				t1.stop();
+				t1.reset();
+				t1.start();
+				autoStatus = 9;
+			}
+
+		} else if (autoStatus == 9) {
+			autoStatus = 9;
+			driveStick.pY = 0;
+		}
+	}
+
+	public void autoMode8() {
+		// Either arms up or down
+		// driveStick.buttons[6] = true;
+		driveStick.buttons[4] = false;
+
+		if (autoStatus == 0) {
+			autoStatus = 1;
+			driveStick.pY = .75;
+			t1.stop();
+			t1.reset();
+			t1.start();
+		} else if (autoStatus == 1) {
+			driveStick.pY = .75;
+			if (t1.get() > 1) {
 				t1.stop();
 				t1.reset();
 				t1.start();
@@ -176,32 +301,40 @@ public class Robot extends a_cmd {
 				rearRightMotor.overcurrent = 0;
 				autoStatus = 2;
 			}
-		} else if (autoStatus == 2 ){
-			if (frontRightMotor.overcurrent > 10 || rearRightMotor.overcurrent > 10 ||frontLeftMotor.overcurrent > 10 || rearLeftMotor.overcurrent > 10)
-				{
+		} else if (autoStatus == 2) {
+			if (frontRightMotor.overcurrent > 10 || rearRightMotor.overcurrent > 10 || frontLeftMotor.overcurrent > 10
+					|| rearLeftMotor.overcurrent > 10) {
 				t1.stop();
 				t1.reset();
 				t1.start();
 
-				autoStatus = 3;}
-			
-			driveStick.pY = .75;
+				autoStatus = 3;
+			}
+
+			driveStick.pY = .55;
 			// Total distance from start
-			if (t1.get() >3) {
+			if (t1.get() > 3) {
 				t1.stop();
 				t1.reset();
 				t1.start();
-				autoStatus = 9;
+				autoStatus = 3;
 			}
 
 		} else if (autoStatus == 3) {
 			driveStick.pY = -.5;
-			driveStick.buttons[6] = true;
-			driveStick.buttons[4] = false;
+			frontLeftMotor.maxI = 22;
+			frontRightMotor.maxI = 22;
+			rearLeftMotor.maxI = 22;
+			rearRightMotor.maxI = 22;
+			frontLeftMotor.overcurrent = 0;
+			frontRightMotor.overcurrent = 0;
+			rearLeftMotor.overcurrent = 0;
+			rearRightMotor.overcurrent = 0;
+			driveStick.buttons[6] = false;
+			driveStick.buttons[4] = true;
 
-			if (t1.get() > .33)
-			{
-				autoStatus =4;
+			if (t1.get() > .33) {
+				autoStatus = 4;
 				t1.stop();
 				t1.reset();
 				t1.start();
@@ -209,12 +342,11 @@ public class Robot extends a_cmd {
 			}
 		} else if (autoStatus == 4) {
 			driveStick.pY = 0;
-			driveStick.buttons[6] = true;
-			driveStick.buttons[4] = false;
+			driveStick.buttons[6] = false;
+			driveStick.buttons[4] = true;
 
-			if (t1.get() > 1)
-			{
-				autoStatus =5;
+			if (t1.get() > 1) {
+				autoStatus = 5;
 				t1.stop();
 				t1.reset();
 				t1.start();
@@ -222,107 +354,84 @@ public class Robot extends a_cmd {
 			}
 		} else if (autoStatus == 5) {
 			driveStick.pY = .75;
-			driveStick.buttons[6] = true;
-			driveStick.buttons[4] = false;
+			driveStick.buttons[6] = false;
+			driveStick.buttons[4] = true;
 
-			if (t1.get() > 2.5)
-			{
-				autoStatus =9;
+			if (t1.get() > 2.5) {
+				autoStatus = 9;
 				t1.stop();
 				t1.reset();
 				t1.start();
 
 			}
 		} else if (autoStatus == 9) {
+			autoStatus = 10;
+			driveStick.buttons[4] = false;
+			driveStick.pY = 0;
+		}
+	}
+
+	/*
+	 * AutoMode 4: Rock Wall
+	 */
+	public void autoMode4(boolean armup) {
+		// Either arms up or down
+
+		// driveStick.buttons[6] = armup;
+		driveStick.buttons[4] = !armup;
+
+		if (autoStatus == 0) {
+			autoStatus = 1;
+			driveStick.pY = .75;
+			t1.stop();
+			t1.reset();
+			t1.start();
+		} else if (autoStatus == 1) {
+			driveStick.buttons[4] = armup;
+			driveStick.pY = .75;
+			if (t1.get() > 2) {
+				t1.stop();
+				t1.reset();
+				t1.start();
+				frontLeftMotor.maxI = 12;
+				frontRightMotor.maxI = 12;
+				rearLeftMotor.maxI = 12;
+				rearRightMotor.maxI = 12;
+				frontLeftMotor.overcurrent = 0;
+				frontRightMotor.overcurrent = 0;
+				rearLeftMotor.overcurrent = 0;
+				rearRightMotor.overcurrent = 0;
+				autoStatus = 2;
+			}
+		} else if (autoStatus == 2) {
+			if (frontRightMotor.overcurrent > 20 || rearRightMotor.overcurrent > 20 || frontLeftMotor.overcurrent > 20
+					|| rearLeftMotor.overcurrent > 20) {
+				autoStatus = 3;
+			}
+
+			driveStick.pY = .75;
+			// Total distance from start
+			if (t1.get() > 2.5) {
+				t1.stop();
+				t1.reset();
+				t1.start();
+				autoStatus = 3;
+			}
+
+		} else if (autoStatus == 3) {
 			autoStatus = 3;
 			driveStick.pY = 0;
 		}
-	}
-	/*
-	 * guilotine
-	 */
-	public void autoMode4(boolean armup) {
-		driveStick.buttons[6] = armup;
-		driveStick.buttons[4] = !armup;
+	} /*
+		 * Auto Mode 1: Option 1: Arms Down Option 2: Arms Don't Move
+		 */
 
-		if (autoStatus == 0) {
-			autoStatus = 1;
-			driveStick.pY = .65;
-			t1.stop();
-			t1.reset();
-			t1.start();
-		} else if (autoStatus == 1) {
-			driveStick.pY = .65;
-			if (t1.get() > 2) {
-				t1.stop();
-				t1.reset();
-				t1.start();
-				frontLeftMotor.maxI = 12;
-				frontRightMotor.maxI = 12;
-				rearLeftMotor.maxI = 12;
-				rearRightMotor.maxI = 12;
-				frontLeftMotor.overcurrent = 0;
-				frontRightMotor.overcurrent = 0;
-				rearLeftMotor.overcurrent = 0;
-				rearRightMotor.overcurrent = 0;
-				autoStatus = 2;
-			}
-		} else if (autoStatus == 2 ){
-			if (frontRightMotor.overcurrent > 10 || rearRightMotor.overcurrent > 10 ||frontLeftMotor.overcurrent > 10 || rearLeftMotor.overcurrent > 10)
-				{autoStatus = 3;}
-			
-			driveStick.pY = .65;
-			if (t1.get() >5) {
-				t1.stop();
-				t1.reset();
-				t1.start();
-				autoStatus = 3;
-			}
-
-
-		} else if (autoStatus == 3) {
-			autoStatus = 4;
-			driveStick.pY = 0;
-		}
-		else if (autoStatus == 4) {
-			// Distance before obstacle 
-			autoStatus = 5;
-			armMotor1.set(-.8);
-			armMotor2.set(-.8);
-			t1.reset();
-			t1.stop();
-			t1.start();
-			driveStick.pY = 0;
-		} else if (autoStatus == 5) {
-			armMotor1.set(-.5);
-			armMotor2.set(-.5);
-			if (t1.get() > .5) {
-				driveStick.pY = .65;
-				autoStatus = 6;
-			}
-		} else if (autoStatus == 6) {
-			armMotor1.set(-.5);
-			armMotor2.set(-.5);
-			// Change Distance after Goal
-			if (t1.get() > 2.5) {
-				t1.reset();
-				t1.stop();
-				driveStick.pY = 0;
-				armMotor1.set(0);
-				armMotor2.set(0);
-				autoStatus = 7;
-			}
-		}
-	}
-	/*
-	 * arms up or down go straight
-	 */
 	public void autoMode1(boolean armup) {
 		// Either arms up or down
-		if (!armup){
-		driveStick.buttons[6] = armup;
+
+		// driveStick.buttons[6] = armup;
 		driveStick.buttons[4] = !armup;
-		}
+
 		if (autoStatus == 0) {
 			autoStatus = 1;
 			driveStick.pY = .75;
@@ -345,19 +454,20 @@ public class Robot extends a_cmd {
 				rearRightMotor.overcurrent = 0;
 				autoStatus = 2;
 			}
-		} else if (autoStatus == 2 ){
-			if (frontRightMotor.overcurrent > 20 || rearRightMotor.overcurrent > 20 ||frontLeftMotor.overcurrent > 20 || rearLeftMotor.overcurrent > 20)
-				{autoStatus = 3;}
-			
+		} else if (autoStatus == 2) {
+			if (frontRightMotor.overcurrent > 20 || rearRightMotor.overcurrent > 20 || frontLeftMotor.overcurrent > 20
+					|| rearLeftMotor.overcurrent > 20) {
+				autoStatus = 3;
+			}
+
 			driveStick.pY = .75;
 			// Total distance from start
-			if (t1.get() >2.5) {
+			if (t1.get() > 2.5) {
 				t1.stop();
 				t1.reset();
 				t1.start();
 				autoStatus = 3;
 			}
-
 
 		} else if (autoStatus == 3) {
 			autoStatus = 3;
@@ -379,69 +489,15 @@ public class Robot extends a_cmd {
 	 */
 
 	public void teleopPeriodic() {
+		//next 3 lines were the arm test in the pit
+//		armMotor1.set(driveStick.getY());
+//		armMotor2.set(driveStick.getY());
+//		return;
 		// gyrotest should display stuff at th display in string 2 on down
 
-		double distance = rf1.getVoltage() * 102.4;
-		if (t1.get() > .25) {
-			// Double angle = gyro.getAngle();
-			Double xVal = b_acc.getX();
-			Double yVal = b_acc.getY();
-			Double zVal = b_acc.getZ();
-			
-			SharedStuff.msg[1] = "RF: " + new Integer((int) distance).toString();
-			SharedStuff.msg[3] = " Enc pos " + elevator.getEncPosition();
-			// Integer ia = new Integer(angle.intValue()* 100);
-			SharedStuff.msg[7] = " x  " + xVal.toString();//
-			// SharedStuff.msg[6] = " angle " + angle.toString();
-			SharedStuff.msg[8] = " y  " + yVal.toString();
-			SharedStuff.msg[9] = " z  " + zVal.toString();
-
-			t1.reset();
-			System.out.println("LF" + frontLeftMotor.getOutputCurrent() + " LR "  + rearLeftMotor.getOutputCurrent() +
-					" RF " + frontRightMotor.getOutputCurrent() + " RR "  + rearRightMotor.getOutputCurrent());
-		}
-		// Output RangeFinder Distance
-		// rangeFinder.setDistance();
-		/*if (driveStick.getRawButton(7)) {
-			state = 1;
-		}*/
-		if (state > 0) {
-			if (state == 1) {
-				state = 2;
-				armMotor1.set(-.8);
-				armMotor1.set(-.8);
-				t1.reset();
-				t1.stop();
-				t1.start();
-				driveStick.pY = 0;
-				aDrive.autonomousPeriodic();
-			} else if (state == 2) {
-				armMotor1.set(-.5);
-				armMotor2.set(-.5);
-				aDrive.autonomousPeriodic();
-				if (t1.get() > .5) {
-					driveStick.pY = .65;
-					state = 3;
-				}
-			} else if (state == 3) {
-				armMotor1.set(-.5);
-				armMotor2.set(-.5);
-				aDrive.autonomousPeriodic();
-				if (t1.get() > 3) {
-					t1.reset();
-					t1.stop();
-					driveStick.pY = 0;
-					armMotor1.set(0);
-					armMotor1.set(0);
-					state = 0;
-
-				}
-
-			}
-		} else {
+//		double distance = rf1.getVoltage() * 102.4;
 			for (int i = 0; i < SharedStuff.cmdlist.size(); i++) {
 				SharedStuff.cmdlist.get(i).teleopPeriodic();
-			}
 		}
 	}
 
@@ -460,7 +516,7 @@ public class Robot extends a_cmd {
 		// Output RangeFinder Distance
 		// rangeFinder.setDistance();
 
-		if (driveStick.getRawButton(7)) {
+		/*if (driveStick.getRawButton(7)) {
 			state = 1;
 		}
 		if (state > 0) {
@@ -539,11 +595,11 @@ public class Robot extends a_cmd {
 		SharedStuff.msg[6] = "right O " + frontRightMotor.getOutputVoltage();
 		SharedStuff.msg[2] = " Left V " + frontLeftMotor.getBusVoltage();
 		SharedStuff.msg[7] = "right V " + frontRightMotor.getBusVoltage();
-		SharedStuff.msg[3] = " Enc pos " + elevator.getEncPosition();
+		/*SharedStuff.msg[3] = " Enc pos " + elevator.getEncPosition();
 		SharedStuff.msg[8] = "getpos" + elevator.getPosition();
 		SharedStuff.msg[4] = " sh1 I " + shootMotor1.getOutputCurrent();
-		SharedStuff.msg[9] = "right S " + shootMotor2.getOutputCurrent();
-		wmsg.testPeriodic();
+		SharedStuff.msg[9] = "right S " + shootMotor2.getOutputCurrent();*/
+		//wmsg.testPeriodic();
 	}
 
 }

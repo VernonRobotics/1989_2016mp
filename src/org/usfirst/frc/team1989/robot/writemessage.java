@@ -14,9 +14,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  *or you can directly write to Robot.sharedStuff.msg etc
  */
-public class writemessage extends a_cmd {
+public class writemessage implements cmd {
 	public Timer t1 = new Timer();
 
+	String type;
 	public writemessage() {
 		this.type = "writemessage"; // so we can find it
 		for (int i = 0; i < 10; i++) {
@@ -97,6 +98,8 @@ public class writemessage extends a_cmd {
     public void testPeriodic() {
     	updatedash();
     }
-    
+    public void autonomousInit(){
+    	
+    }
 
 }

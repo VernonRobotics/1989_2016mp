@@ -19,6 +19,7 @@ public interface cmd {
     public void teleopInit();
     public void teleopPeriodic() ;
 
+    String type = "cmd";
 
 	//public ArrayList<autocmd> auto_list = new ArrayList<autocmd>(); // list of auto commands
 

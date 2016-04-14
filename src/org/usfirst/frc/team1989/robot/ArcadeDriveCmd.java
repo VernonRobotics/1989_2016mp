@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class ArcadeDriveCmd extends a_cmd {
+public class ArcadeDriveCmd implements cmd{
 
 	public String type = "arcadeDriveCmd";
 	public ArrayList<cmd> list;
@@ -93,8 +93,8 @@ public class ArcadeDriveCmd extends a_cmd {
 	@Override
 	public void teleopPeriodic() {
 		// TODO Auto-generated method stub
-		if(driveStick.getRawButton(12)) {
-			arcadeDrive(0 - driveStick.sgetY(), 0 - driveStick.sgetTwist()*.75 + offsetCalc());
+		if(driveStick.getRawButton(7) == true) {
+			arcadeDrive(0 - driveStick.sgetY(), 0 - driveStick.sgetTwist()*.45 + offsetCalc());
 		} else {
 			arcadeDrive(0 - driveStick.sgetY(), 0-driveStick.sgetTwist()*.75 + offsetCalc());
 		}
